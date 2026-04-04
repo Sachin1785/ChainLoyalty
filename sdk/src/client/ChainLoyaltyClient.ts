@@ -175,6 +175,21 @@ export class ChainLoyaltyClient {
     );
   }
 
+  async purchaseStoreItem(walletAddress: string, itemId: string, cost: number): Promise<{status: string, tx_hash: string, wallet: string, item_id: string}> {
+    return await this.request(
+      `/api/v1/gamification/purchase`,
+      {
+        method: "POST",
+        body: {
+          wallet_address: walletAddress,
+          item_id: itemId,
+          cost: cost
+        }
+      }
+    );
+  }
+
+
   private async request<T>(path: string, options: RequestOptions): Promise<T> {
     const {
       timeoutMs,

@@ -1,72 +1,156 @@
 # ChainLoyalty SDK
 
-TypeScript SDK and React Query hooks for integrating with ChainLoyalty registry APIs.
+The ultimate **Loyalty-as-a-Service** toolkit for Web3. Drop-in, themeable, and high-performance loyalty components for any React application (Next.js, Vite, etc.).
 
-## Prerequisites
+Built with a **Neo-Brutalism** aesthetic, zero external CSS dependencies, and lightweight TypeScript logic.
 
-- Wrap your app with React Query's QueryClientProvider.
-- Use a valid ChainLoyalty registry base URL.
+[![npm version](https://img.shields.io/npm/v/loyaltychain-sdk.svg)](https://www.npmjs.com/package/loyaltychain-sdk)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## Install
+---
+
+## 🏗️ Features
+
+- 🎯 **Points & XP**: Track and display user progress in real-time.
+- 🏆 **Leaderboards**: Fully themeable rankings with podium support.
+- 🎡 **Gamification**: Interactive "Spin-to-Win" reward wheels.
+- 🔗 **Referrals**: One-click referral code generation and management.
+- 🛡️ **Auto-Wallet Detection**: Components automatically show a "Connect Wallet" CTA if no address is provided.
+- 🎨 **Neo-Brutalism Design**: High-contrast, bold design that stands out.
+
+---
+
+## 📦 Installation
 
 ```bash
 npm install loyaltychain-sdk
+# or
+yarn add loyaltychain-sdk
 ```
 
-## Client Usage
+---
 
-```ts
+## 🚀 Quick Start
+
+### 1. Initialize the Client
+
+The `ChainLoyaltyClient` is the core bridge between your frontend and the loyalty engine.
+
+```tsx
 import { ChainLoyaltyClient } from "loyaltychain-sdk";
 
 const client = new ChainLoyaltyClient({
-  baseUrl: "https://api.chainloyalty.dev",
-  apiKey: "your-api-key",
+  baseUrl: "http://localhost:8000", // Your loyalty backend API
+  apiKey: "optional-api-key",
 });
-
-const nonce = await client.requestNonce({ walletAddress: "0xabc..." });
 ```
 
-## React Hooks Usage
+### 2. Wrap with QueryClientProvider
 
-```ts
-import { useRewardBalance } from "loyaltychain-sdk";
-
-const rewards = useRewardBalance(client, walletAddress);
-```
-
-## Widgets & Components
-
-This SDK includes several drop-in React components that can be used to add loyalty features to your site in seconds.
-
-| Component | Documentation | Description |
-| :--- | :--- | :--- |
-| **SpinWidget** | [docs/SpinWidget.md](docs/SpinWidget.md) | Interactive on-chain reward wheel. |
-| **Leaderboard** | [docs/Leaderboard.md](docs/Leaderboard.md) | Rankings with podiums and theming. |
-| **ReferralWidget** | [docs/ReferralWidget.md](docs/ReferralWidget.md) | Code generation and copy-to-clipboard. |
-| **RewardsDashboard** | [docs/RewardsDashboard.md](docs/RewardsDashboard.md) | Balances and activity history. |
-
-## Quick Start
+The components use `@tanstack/react-query` internally for state management.
 
 ```tsx
-import { Leaderboard, RewardsDashboard } from "loyaltychain-sdk";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-<RewardsDashboard client={client} walletAddress={walletAddress} />
-<Leaderboard client={client} page={1} pageSize={10} />
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <YourApp />
+    </QueryClientProvider>
+  );
+}
 ```
 
-Both components are responsive and can be themed via theme/style props.
+### 3. Add a Component
 
-## End-to-End Example
+```tsx
+import { Leaderboard } from "loyaltychain-sdk";
 
-See `examples/minimal-integration.tsx` for a full integration sample with:
+<Leaderboard 
+  client={client} 
+  title="Top Players" 
+  showPodium={true} 
+/>
+```
 
-- QueryClientProvider setup
-- SDK client initialization
-- Event submission mutation
-- RewardsDashboard + Leaderboard rendering
+---
 
-## Supported Reward Types
+## 🧩 Components
 
-- points
-- badge
-- probabilistic
+### 1. `RewardsDashboard`
+Displays user's total points, recent activities, and claimed items.
+- **Key Props**: `walletAddress`, `onConnect`, `theme`.
+- **Docs**: [RewardsDashboard.md](./docs/RewardsDashboard.md)
+
+### 2. `SpinWidget`
+An interactive "Spin-to-Win" wheel. Users spend points to gain random rewards (Tokens, Badges, etc.).
+- **Key Props**: `walletAddress`, `lootboxId`, `wheelColors`.
+- **Docs**: [SpinWidget.md](./docs/SpinWidget.md)
+
+### 3. `Leaderboard`
+Real-time ranking of all users in your program.
+- **Key Props**: `limit`, `showPodium`, `accentColor`.
+- **Docs**: [Leaderboard.md](./docs/Leaderboard.md)
+
+### 4. `ReferralWidget`
+Generates unique referral codes and copyable links for users.
+- **Key Props**: `walletAddress`, `onConnect`.
+- **Docs**: [ReferralWidget.md](./docs/ReferralWidget.md)
+
+---
+
+## 🎨 Theming
+
+All components support a `theme` prop that allows you to change the aesthetic to match your brand.
+
+```tsx
+<Leaderboard 
+  theme={{
+    accent: "#FFD703",      // Primary color (e.g. Yellow)
+    border: "#000000",      // Stroke color
+    shadow: "4px 4px 0 0 black", // Neo-Brutalism shadow
+    cardBase: "#ffffff",    // Background color
+  }}
+/>
+```
+
+---
+
+## 🔌 Wallet Connectivity
+
+If you pass an empty `walletAddress` string, the components will automatically enter a **Fallback State**. They will render a button that triggers the `onConnect` callback prop.
+
+```tsx
+<RewardsDashboard 
+  walletAddress={userWallet || ""} 
+  onConnect={(newAddress) => {
+    // Handle login flow (e.g. MetaMask or SIWE)
+    console.log("Connecting user:", newAddress);
+  }}
+/>
+```
+
+---
+
+## 🛠️ SDK Client API
+
+You can also use the client directly for custom logic:
+
+```ts
+// Submit a custom event (e.g. 'purchase', 'login', 'social_share')
+await client.ingestEvent("0x123...", "purchase", { amount: 500 });
+
+// Fetch leaderboard manually
+const topUsers = await client.getLeaderboard(1, 10);
+
+// Get user stats
+const stats = await client.getUserStats("0x123...");
+```
+
+---
+
+## 📄 License
+
+MIT © [ChainLoyalty](https://github.com/Prasham/LoyaltyChain)

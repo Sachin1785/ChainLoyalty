@@ -203,3 +203,51 @@ def reveal_spin(wallet_address: str, salt_hex: str):
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Reveal failed: {str(e)}")
+
+from pydantic import BaseModel
+
+class PurchaseRequest(BaseModel):
+    wallet_address: str
+    item_id: str
+    cost: int
+    program_id: str = "default"
+
+@router.post("/purchase")
+def purchase_store_item(req: PurchaseRequest):
+    """
+    Burn points from a user to purchase a store item.
+    """
+    with Session(engine) as session:
+        # Check if user exists and has enough points
+        # In a generic SDK, we assume the frontend only calls this when they have enough points,
+        # but we should check balances here if we had a quick way.
+        # For now, we will try to burn directly. The smart contract will fail if they lack balance.
+        
+        try:
+            from lib.blockchain import spend_points
+            tx_hash = spend_points(req.wallet_address, req.cost, req.program_id, f"Purchased {req.item_id}")
+            if not tx_hash:
+                raise Exception("Blockchain transaction failed to initialize")
+                
+            # Log the spend in RewardHistory
+            reward = RewardHistory(
+                wallet_address=w3.to_checksum_address(req.wallet_address),
+                program_id=req.program_id,
+                reward_type="points", # spending points
+                amount=-req.cost, # negative for spending
+                reason=f"Store Purchase: {req.item_id}",
+                tx_hash=tx_hash,
+                status="spent"
+            )
+            session.add(reward)
+            session.commit()
+            
+            return {
+                "status": "success",
+                "tx_hash": tx_hash,
+                "wallet": req.wallet_address,
+                "item_id": req.item_id
+            }
+        except Exception as e:
+            print(f"[gamification] Purchase failed: {str(e)}")
+            raise HTTPException(status_code=400, detail=str(e))

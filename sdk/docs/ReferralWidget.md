@@ -28,7 +28,8 @@ export function App() {
 | Prop | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `client` | `ChainLoyaltyClient` | Required | Instance of the ChainLoyalty client. |
-| `walletAddress` | `string` | Required | User's wallet to associate the code with. |
+| `walletAddress` | `string` | Required | User's wallet to associate the code with. Falls back to "Connect Wallet" if empty. |
+| `onConnect` | `(address: string) => void` | `undefined` | Callback fired when the "Connect Wallet" button is clicked. |
 | `title` | `string` | `"Your Referral Code"` | Header text. |
 | `referralRewardText`| `string` | `"Earn 200 pts per referral!"` | Promo sub-caption below the code. |
 | `theme` | `ReferralWidgetTheme` | See below | Style overrides. |

@@ -21,7 +21,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
-    "loyaltychain-sdk": "file:../../sdk/loyaltychain-sdk-0.1.0.tgz",
+    "loyaltychain-sdk": "file:../../sdk/loyaltychain-sdk-0.1.2.tgz",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
