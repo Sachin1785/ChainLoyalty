@@ -19,6 +19,8 @@ import {
   Hash,
   Tag,
   X,
+  Cpu,
+  FileEdit,
 } from "lucide-react";
 import { getRules, createRule, deleteRule, updateRule, fetchAllBadges } from "@/lib/utils/api";
 
@@ -255,8 +257,7 @@ export function PointRulesEditor({ compact = false, mode = 'full', onSelectRule,
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    onClick={() => onSelectRule && onSelectRule(rule)}
-                    className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow group relative cursor-pointer"
+                    className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow group relative"
                   >
                     <div className={`h-1.5 w-full ${isPoints ? "bg-emerald-500" : "bg-violet-500"}`} />
 
@@ -297,34 +298,41 @@ export function PointRulesEditor({ compact = false, mode = 'full', onSelectRule,
                         </div>
                       )}
 
-                      <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-50 mt-4">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-xl font-black ${isPoints ? "text-emerald-500" : "text-violet-500"}`}>
+                      <div className="mt-auto pt-4 border-t border-gray-50 mt-4 flex items-center justify-between">
+                        <div className="flex items-baseline gap-1.5 min-w-0">
+                          <span className={`text-lg font-black leading-none ${isPoints ? "text-emerald-500" : "text-violet-500"}`}>
                             +{raw.reward_value ?? rule.actions?.[0]?.payload?.amount ?? "?"}
                           </span>
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight truncate">
                             {raw.reward_type ?? (isPoints ? "pts" : "badge")}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 ml-2">
                           {/* Toggle */}
                           <button
-                            onClick={() => handleToggle(rule)}
-                            className="w-8 h-8 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all"
+                            onClick={(e) => { e.stopPropagation(); handleToggle(rule); }}
+                            className="w-7 h-7 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all"
                             title={rule.enabled ? "Deactivate" : "Activate"}
                           >
-                            {rule.enabled ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
+                            {rule.enabled ? <ToggleRight size={14} /> : <ToggleLeft size={14} />}
                           </button>
-                          {/* Edit */}
+                          
+                          {/* Graph Selection (Visual) */}
                           <button
-                            onClick={(e) => {
-                               e.stopPropagation();
-                               if (onSelectRule) onSelectRule(rule);
-                               else openEditModal(rule);
-                            }}
-                            className="w-8 h-8 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all"
+                            onClick={(e) => { e.stopPropagation(); onSelectRule?.(rule); }}
+                            className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${rule.id === editingId ? 'bg-purple-600 text-white shadow-lg scale-110' : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-900'}`}
+                            title="Visual Node Graph"
                           >
-                            <Edit3 size={14} />
+                            <Cpu size={12} />
+                          </button>
+
+                          {/* Quick Form Edit */}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); openEditModal(rule); }}
+                            className="w-7 h-7 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all shrink-0"
+                            title="Direct Form Edit"
+                          >
+                            <FileEdit size={12} />
                           </button>
                         </div>
                       </div>

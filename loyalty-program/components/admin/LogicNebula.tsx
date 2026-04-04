@@ -334,141 +334,202 @@ export function LogicNebula({ ruleToEdit, onDeploySuccess, onNewRule }: { ruleTo
             onClick={(e) => e.stopPropagation()}
             className="absolute right-8 top-8 bottom-8 w-80 bg-white rounded-[32px] shadow-2xl z-50 border border-gray-50 flex flex-col overflow-hidden"
           >
-            <div className="p-5 border-b border-gray-50 flex items-center justify-between bg-[#F8F7F3]/50">
-               <div>
-                  <h3 className="text-lg font-bold tracking-tight">Node Configuration</h3>
-                  <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mt-0.5">Logic_Protocol_{activeNode.id.slice(0,4)}</p>
-               </div>
-               <button onClick={() => setSelectedNode(null)} className="p-2 text-gray-300 hover:text-gray-900 transition-colors">
-                  <X size={20} />
-               </button>
-            </div>
-            
-            <div className="flex-1 p-6 space-y-5 overflow-y-auto custom-scrollbar">
-               {/* Global Label */}
-               <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Friendly Label</label>
-                  <input 
-                    value={activeNode.label}
-                    onChange={(e) => updateNode(activeNode.id, { label: e.target.value })}
-                    className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none focus:bg-white focus:ring-2 focus:ring-purple-50 border-none transition-all shadow-inner"
-                  />
-               </div>
+            {activeNode ? (
+              <>
+                <div className="p-5 border-b border-gray-50 flex items-center justify-between bg-[#F8F7F3]/50">
+                   <div>
+                      <h3 className="text-lg font-bold tracking-tight">Node Configuration</h3>
+                      <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mt-0.5">Logic_Protocol_{activeNode.id.slice(0,4)}</p>
+                   </div>
+                   <button onClick={() => setSelectedNode(null)} className="p-2 text-gray-300 hover:text-gray-900 transition-colors">
+                      <X size={20} />
+                   </button>
+                </div>
+                
+                <div className="flex-1 p-6 space-y-5 overflow-y-auto custom-scrollbar">
+                   {/* Global Label */}
+                   <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Friendly Label</label>
+                      <input 
+                        value={activeNode.label}
+                        onChange={(e) => updateNode(activeNode.id, { label: e.target.value })}
+                        className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none focus:bg-white focus:ring-2 focus:ring-purple-50 border-none transition-all shadow-inner"
+                      />
+                   </div>
 
-               {/* TYPE SPECIFIC RULES */}
-               <div className="space-y-4 pt-4 border-t border-gray-50">
-                  <div className="text-[10px] font-black uppercase text-purple-600 tracking-tighter">Nebula_Rule_Settings</div>
-                  
-                  {activeNode.type === 'trigger' && (
-                    <div className="space-y-3">
-                       <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Event Origin</label>
-                          <select className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner">
-                             <option>Web3 Wallet Event</option>
-                             <option>EAS Attestation</option>
-                             <option>API Webhook</option>
-                          </select>
-                       </div>
-                    </div>
-                  )}
+                   {/* TYPE SPECIFIC RULES */}
+                   <div className="space-y-4 pt-4 border-t border-gray-50">
+                      <div className="text-[10px] font-black uppercase text-purple-600 tracking-tighter">Nebula_Rule_Settings</div>
+                      
+                      {activeNode.type === 'trigger' && (
+                        <div className="space-y-3">
+                           <div className="space-y-1">
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Event Origin</label>
+                              <select className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner">
+                                 <option>Web3 Wallet Event</option>
+                                 <option>EAS Attestation</option>
+                                 <option>API Webhook</option>
+                              </select>
+                           </div>
+                        </div>
+                      )}
 
-                  {activeNode.type === 'filter' && (
-                    <div className="space-y-3">
-                       <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Logic Operator</label>
-                          <select className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner">
-                             <option>Greater than (&gt;)</option>
-                             <option>Less than (&lt;)</option>
-                             <option>Exactly Equals (==)</option>
-                             <option>Has Attestation</option>
-                          </select>
-                       </div>
-                       <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Threshold Value</label>
-                          <input 
-                            type="number"
-                            placeholder="0.00"
-                            className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner"
-                          />
-                       </div>
-                    </div>
-                  )}
+                      {activeNode.type === 'filter' && (
+                        <div className="space-y-3">
+                           <div className="space-y-1">
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Logic Operator</label>
+                              <select className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner">
+                                 <option>Greater than (&gt;)</option>
+                                 <option>Less than (&lt;)</option>
+                                 <option>Exactly Equals (==)</option>
+                                 <option>Has Attestation</option>
+                              </select>
+                           </div>
+                           <div className="space-y-1">
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Threshold Value</label>
+                              <input 
+                                type="number"
+                                placeholder="0.00"
+                                className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner"
+                              />
+                           </div>
+                        </div>
+                      )}
 
-                  {activeNode.type === 'action' && (
-                    <div className="space-y-4">
-                       <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Protocol Action</label>
-                          <div className="grid grid-cols-2 gap-2">
-                             <button 
-                               onClick={() => updateNode(activeNode.id, { data: { ...activeNode.data, rewardType: 'badge' }})}
-                               className={`h-10 rounded-xl text-[10px] font-bold uppercase transition-all ${activeNode.data?.rewardType === 'badge' ? 'bg-purple-600 text-white shadow-lg' : 'bg-[#F8F7F3] text-gray-400 border border-gray-100 hover:bg-white'}`}
-                             >
-                               Mint Badge
-                             </button>
-                             <button 
-                               onClick={() => updateNode(activeNode.id, { data: { ...activeNode.data, rewardType: 'points' }})}
-                               className={`h-10 rounded-xl text-[10px] font-bold uppercase transition-all ${activeNode.data?.rewardType === 'points' || !activeNode.data?.rewardType ? 'bg-emerald-600 text-white shadow-lg' : 'bg-[#F8F7F3] text-gray-400 border border-gray-100 hover:bg-white'}`}
-                             >
-                               Emit Points
-                             </button>
-                          </div>
-                       </div>
+                      {activeNode.type === 'action' && (
+                        <div className="space-y-4">
+                           <div className="space-y-1">
+                              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Protocol Action</label>
+                              <div className="grid grid-cols-2 gap-2">
+                                 <button 
+                                   onClick={() => updateNode(activeNode.id, { data: { ...activeNode.data, rewardType: 'badge' }})}
+                                   className={`h-10 rounded-xl text-[10px] font-bold uppercase transition-all ${activeNode.data?.rewardType === 'badge' ? 'bg-purple-600 text-white shadow-lg' : 'bg-[#F8F7F3] text-gray-400 border border-gray-100 hover:bg-white'}`}
+                                 >
+                                   Mint Badge
+                                 </button>
+                                 <button 
+                                   onClick={() => updateNode(activeNode.id, { data: { ...activeNode.data, rewardType: 'points' }})}
+                                   className={`h-10 rounded-xl text-[10px] font-bold uppercase transition-all ${activeNode.data?.rewardType === 'points' || !activeNode.data?.rewardType ? 'bg-emerald-600 text-white shadow-lg' : 'bg-[#F8F7F3] text-gray-400 border border-gray-100 hover:bg-white'}`}
+                                 >
+                                   Emit Points
+                                 </button>
+                              </div>
+                           </div>
 
-                       {activeNode.data?.rewardType === 'badge' ? (
-                          <div className="space-y-1">
-                             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Badge Registry</label>
-                             <select 
-                               value={activeNode.data?.rewardValue || ''}
-                               onChange={(e) => updateNode(activeNode.id, { data: { ...activeNode.data, rewardValue: e.target.value }})}
-                               className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner"
-                             >
-                                <option value="">Select Badge Standard</option>
-                                {availableBadges.map(b => (
-                                   <option key={b.id} value={b.id}>{b.name}</option>
-                                ))}
-                             </select>
-                          </div>
-                       ) : (
-                          <div className="space-y-1">
-                             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Points Amount</label>
-                             <input 
-                               type="number"
-                               value={activeNode.data?.rewardValue || 0}
-                               onChange={(e) => updateNode(activeNode.id, { data: { ...activeNode.data, rewardValue: parseInt(e.target.value) }})}
-                               placeholder="100"
-                               className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner"
-                             />
-                          </div>
-                       )}
+                           {activeNode.data?.rewardType === 'badge' ? (
+                              <div className="space-y-1">
+                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Badge Registry</label>
+                                 <select 
+                                   value={activeNode.data?.rewardValue || ''}
+                                   onChange={(e) => updateNode(activeNode.id, { data: { ...activeNode.data, rewardValue: e.target.value }})}
+                                   className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner"
+                                 >
+                                    <option value="">Select Badge Standard</option>
+                                    {availableBadges.map(b => (
+                                       <option key={b.id} value={b.id}>{b.name}</option>
+                                    ))}
+                                 </select>
+                              </div>
+                           ) : (
+                              <div className="space-y-1">
+                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Points Amount</label>
+                                 <input 
+                                   type="number"
+                                   value={activeNode.data?.rewardValue || 0}
+                                   onChange={(e) => updateNode(activeNode.id, { data: { ...activeNode.data, rewardValue: parseInt(e.target.value) }})}
+                                   placeholder="100"
+                                   className="w-full h-10 bg-[#F8F7F3] rounded-xl px-4 text-sm font-semibold outline-none border-none shadow-inner"
+                                 />
+                              </div>
+                           )}
 
-                       <div className="flex items-center justify-between p-3 bg-purple-50/50 rounded-2xl border border-purple-100">
-                          <div>
-                             <h4 className="text-[10px] font-black uppercase tracking-widest text-purple-600 mb-1">Auto-Mint</h4>
-                             <p className="text-[8px] font-bold text-purple-800/60 leading-tight">Emit instantly on-chain.</p>
-                          </div>
-                          <button
-                             onClick={() => updateNode(activeNode.id, { data: { ...activeNode.data, automaticMint: !(activeNode.data?.automaticMint ?? true) }})}
-                             className={`w-10 h-5 rounded-full transition-colors relative ${activeNode.data?.automaticMint !== false ? 'bg-purple-600' : 'bg-gray-200'}`}
-                          >
-                             <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${activeNode.data?.automaticMint !== false ? 'translate-x-5' : 'translate-x-0'}`} />
-                          </button>
-                       </div>
-                    </div>
-                  )}
-               </div>
+                           <div className="flex items-center justify-between p-3 bg-purple-50/50 rounded-2xl border border-purple-100">
+                              <div>
+                                 <h4 className="text-[10px] font-black uppercase tracking-widest text-purple-600 mb-1">Auto-Mint</h4>
+                                 <p className="text-[8px] font-bold text-purple-800/60 leading-tight">Emit instantly on-chain.</p>
+                              </div>
+                              <button
+                                 onClick={() => updateNode(activeNode.id, { data: { ...activeNode.data, automaticMint: !(activeNode.data?.automaticMint ?? true) }})}
+                                 className={`w-10 h-5 rounded-full transition-colors relative ${activeNode.data?.automaticMint !== false ? 'bg-purple-600' : 'bg-gray-200'}`}
+                              >
+                                 <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${activeNode.data?.automaticMint !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+                              </button>
+                           </div>
+                        </div>
+                      )}
+                   </div>
 
-               <div className="space-y-4 pt-8">
-                  <div className="p-4 bg-purple-50 rounded-2xl border border-purple-100 border-dashed">
-                     <p className="text-[10px] font-medium text-purple-400 leading-relaxed uppercase">Real-time sync enabled. Changes are logged to the protocol history.</p>
-                  </div>
-                  <button 
-                    onClick={() => deleteNode(activeNode.id)}
-                    className="w-full py-4 bg-red-50 text-red-500 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-red-500 hover:text-white transition-all shadow-sm"
-                  >
-                    <Trash2 size={16} /> Terminate Node
-                  </button>
-               </div>
-            </div>
+                   <div className="space-y-4 pt-8">
+                      <div className="p-4 bg-purple-50 rounded-2xl border border-purple-100 border-dashed">
+                         <p className="text-[10px] font-medium text-purple-400 leading-relaxed uppercase">Real-time sync enabled. Changes are logged to the protocol history.</p>
+                      </div>
+                      <button 
+                        onClick={() => deleteNode(activeNode.id)}
+                        className="w-full py-4 bg-red-50 text-red-500 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                      >
+                        <Trash2 size={16} /> Terminate Node
+                      </button>
+                   </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="p-5 border-b border-gray-50 flex items-center justify-between bg-black/5 text-gray-900">
+                   <div>
+                      <h3 className="text-lg font-bold tracking-tight">Rule Core</h3>
+                      <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mt-0.5">Protocol Metadata Wrapper</p>
+                   </div>
+                </div>
+                
+                <div className="flex-1 p-6 space-y-6 overflow-y-auto custom-scrollbar">
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">Deployment Name</label>
+                      <input 
+                        value={ruleName}
+                        onChange={(e) => setRuleName(e.target.value)}
+                        className="w-full h-12 bg-[#F8F7F3] rounded-2xl px-6 text-sm font-semibold outline-none focus:bg-white focus:ring-2 focus:ring-purple-100 border-none transition-all shadow-inner"
+                      />
+                   </div>
+
+                   <div className="p-6 bg-[#F8F7F3] rounded-[32px] border border-gray-100 space-y-4">
+                      <div className="flex items-center justify-between">
+                         <div>
+                            <p className="text-sm font-bold text-gray-900">Live Status</p>
+                            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-tight mt-1">Enable rule execution</p>
+                         </div>
+                         <div className="w-12 h-6 bg-purple-600 rounded-full flex items-center px-1">
+                            <div className="w-4 h-4 bg-white rounded-full shadow-sm" />
+                         </div>
+                      </div>
+                      <div className="pt-4 border-t border-gray-100">
+                         <div className="flex justify-between items-center text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                            <span>Program ID</span>
+                            <span className="text-gray-900">DEFAULT</span>
+                         </div>
+                      </div>
+                   </div>
+
+                   <div className="mt-auto p-6 bg-purple-50 rounded-[32px] border border-purple-100">
+                      <div className="flex items-center gap-2 mb-2">
+                         <Star size={16} className="text-purple-600" />
+                         <span className="text-[10px] font-bold uppercase tracking-widest text-purple-600">Quick Guide</span>
+                      </div>
+                      <p className="text-[10px] font-medium text-purple-400 leading-relaxed">
+                        To edit individual logic gates, click on a node in the graph. Drag connections to link triggers to rewards. 
+                      </p>
+                   </div>
+
+                   <button 
+                     onClick={deployRule}
+                     disabled={deploying}
+                     className="w-full py-4 bg-black text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-xl mt-4"
+                   >
+                     {deploying ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                     Push Changes to Protocol
+                   </button>
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

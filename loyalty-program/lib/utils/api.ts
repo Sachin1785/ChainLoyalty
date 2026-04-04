@@ -42,6 +42,45 @@ function badgeFromBackend(b: BackendBadge): any {
   };
 }
 
+const mockBadges = [
+  {
+    id: "badge-1",
+    name: "Bronze",
+    description: "Foundational achievement tier. Awarded for completing initial onboarding and your first valid transaction.",
+    metadataUri: "ipfs://QmExample1",
+    maxSupply: 1000,
+    transferable: false,
+    createdAt: new Date("2024-01-01"),
+  },
+  {
+    id: "badge-2",
+    name: "Silver",
+    description: "Recognition for sustained protocol engagement. Awarded to users who maintain active participation over 30 days.",
+    metadataUri: "ipfs://QmExample2",
+    maxSupply: 1000,
+    transferable: false,
+    createdAt: new Date("2024-01-15"),
+  },
+  {
+    id: "badge-3",
+    name: "Gold",
+    description: "Elite status reserved for top-tier contributors. Recognition for significant volume and ecosystem leadership.",
+    metadataUri: "ipfs://QmExample3",
+    maxSupply: 1000,
+    transferable: false,
+    createdAt: new Date("2024-02-01"),
+  },
+  {
+    id: "badge-4",
+    name: "Platinum",
+    description: "Legendary tier status. Reserved for the most dedicated protocol explorers who have reached the absolute peak of participation and engagement.",
+    metadataUri: "ipfs://QmExample4",
+    maxSupply: 1000,
+    transferable: false,
+    createdAt: new Date("2024-03-01"),
+  },
+];
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
 const USE_MOCK_API = process.env.NEXT_PUBLIC_USE_MOCK_API === "true";
 
@@ -138,13 +177,14 @@ export async function uploadBadgeImage(file: File) {
 }
 
 export async function fetchAllBadges() {
-  return callApi(
-    async () => {
-      const res = await adminClient.get("badges");
-      return { data: res.data.map(badgeFromBackend) };
-    },
-    () => mockApi.fetchAllBadges()
-  );
+  if (USE_MOCK_API) return mockApi.fetchAllBadges();
+  try {
+    const res = await adminClient.get("/badges");
+    return res.data.map(badgeFromBackend);
+  } catch (error) {
+    console.warn("fetchAllBadges failed, using mock:", error);
+    return mockApi.fetchAllBadges();
+  }
 }
 
 export async function registerBadge(badgeData: any) {

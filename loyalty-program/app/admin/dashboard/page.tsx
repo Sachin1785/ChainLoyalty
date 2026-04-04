@@ -3,17 +3,16 @@
 import { BadgeRegistry } from "@/components/admin/BadgeRegistry";
 import { PointsConfiguration } from "@/components/admin/PointsConfiguration";
 import { LogicNebula } from "@/components/admin/LogicNebula";
-import { EconomyHeartbeat } from "@/components/admin/EconomyHeartbeat";
+import { HeartbeatAnalytics } from "@/components/admin/HeartbeatAnalytics";
 import { useWallet } from "@/lib/hooks";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutGrid,
-  Activity,
+  LogOut,
   User,
   Bell,
   Search,
-  Plus,
   BarChart3,
   Box,
   ShoppingCart,
@@ -31,7 +30,7 @@ import {
 
 import { PointRulesEditor } from "@/components/admin/PointRulesEditor";
 
-type TabType = "badges" | "rules" | "points" | "logic" | "economy";
+type TabType = "badges" | "logic" | "analytics";
 
 export default function AdminDashboard() {
   const { isConnected, connect, isConnecting } = useWallet();
@@ -110,7 +109,7 @@ export default function AdminDashboard() {
                                <Settings size={14} /> Account Settings
                             </button>
                             <button className="w-full text-left px-4 py-3 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors flex items-center gap-3">
-                               <Activity size={14} /> Terminate Session
+                               <LogOut size={14} /> Terminate Session
                             </button>
                          </div>
                       </motion.div>
@@ -120,31 +119,20 @@ export default function AdminDashboard() {
             </header>
 
            {/* Dashboard Content */}
-           <main className="flex-1 overflow-hidden px-8 pb-8 flex flex-col">
+           <main className="flex-1 overflow-hidden px-6 pb-4 flex flex-col">
               
-              {/* Tab Navigation (Direct access to all pages) */}
-              <div className="flex items-center justify-between mb-6 shrink-0">
+              {/* Tab Navigation */}
+              <div className="flex items-center mb-3 shrink-0">
                  <div className="flex items-center gap-6 border-b border-gray-100 w-full mb-[-1px]">
                     <TabLink active={activeTab === 'badges'} onClick={() => setActiveTab('badges')} label="Badge Forge" num="01" />
                     <TabLink active={activeTab === 'logic'} onClick={() => setActiveTab('logic')} label="Logic Nebula" num="02" />
-                    <TabLink active={activeTab === 'points'} onClick={() => setActiveTab('points')} label="Economy" num="03" />
-                    <TabLink active={activeTab === 'economy'} onClick={() => setActiveTab('economy')} label="Heartbeat" num="04" />
-                 </div>
-                 
-                 <div className="flex items-center gap-3 ml-6 shrink-0">
-                    <div className="h-10 px-4 bg-[#F8F7F3] rounded-xl border border-gray-100 flex items-center gap-2 text-[10px] font-bold cursor-pointer whitespace-nowrap uppercase tracking-widest text-gray-400">
-                       <Activity size={14} />
-                       LIVE_FEED
-                    </div>
-                    <button className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white cursor-pointer shadow-lg hover:rotate-6 transition-all active:scale-90">
-                       <Plus size={20} />
-                    </button>
+                    <TabLink active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} label="Partner Analytics" num="03" />
                  </div>
               </div>
 
               {/* Dynamic Page Workspace */}
-              <div className="flex-1 bg-[#F8F7F3]/30 rounded-[32px] p-2 min-h-0 overflow-hidden">
-                 <div className="h-full luxury-card-inner !bg-white rounded-[28px] overflow-y-auto custom-scrollbar">
+              <div className="flex-1 bg-[#F8F7F3]/30 rounded-[32px] p-1 min-h-0 overflow-hidden">
+                 <div className="h-full luxury-card-inner !bg-white rounded-[28px] overflow-hidden">
                     <AnimatePresence mode="wait">
                        <motion.div
                          key={activeTab}
@@ -152,7 +140,7 @@ export default function AdminDashboard() {
                          animate={{ opacity: 1, scale: 1 }}
                          exit={{ opacity: 0, scale: 0.99 }}
                          transition={{ duration: 0.2 }}
-                         className="h-full"
+                         className={`h-full ${activeTab !== 'analytics' ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
                        >
                          {activeTab === "logic" && (
                             <div className="p-6 h-full flex flex-row gap-8 overflow-hidden">
@@ -183,14 +171,11 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
                          )}
-                         {activeTab === "economy" && (
-                            <div className="p-6 h-full"><EconomyHeartbeat /></div>
+                         {activeTab === "analytics" && (
+                            <div className="h-full overflow-hidden"><HeartbeatAnalytics /></div>
                          )}
                          {activeTab === "badges" && (
                             <div className="p-6 h-full"><BadgeRegistry /></div>
-                         )}
-                         {activeTab === "points" && (
-                            <div className="p-6 h-full"><PointsConfiguration /></div>
                          )}
                        </motion.div>
                     </AnimatePresence>
