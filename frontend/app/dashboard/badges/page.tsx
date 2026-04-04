@@ -26,7 +26,8 @@ interface BadgeStandard {
   name: string;
   description: string;
   metadataUri: string;
-  maxSupply: number;
+  point_value: number;
+  max_supply: number;
   transferable: boolean;
 }
 
@@ -88,10 +89,18 @@ export default function BadgesPage() {
       });
     } catch (err) {
       console.error("Claim error:", err);
-    } finally {
       setClaimingId(null);
-    }
+    } 
+    // We don't nullify claimingId here to let the success effect use it
   };
+
+  useEffect(() => {
+    if (isSuccess && hash && claimingId) {
+      fetch(`${API_BASE}/rewards/report-tx?reward_id=${claimingId}&tx_hash=${hash}`, { method: "POST" })
+        .catch(err => console.error("Failed to report tx:", err))
+        .finally(() => setClaimingId(null));
+    }
+  }, [isSuccess, hash, claimingId]);
 
   const earned = earnedBadges.map(eb => {
     const std = allStandards.find(s => Number(s.id) === Number(eb.amount));
@@ -136,12 +145,27 @@ export default function BadgesPage() {
                   )}
                 </div>
                 <h3 className="font-black text-lg leading-tight">{badge.standard?.name || badge.reason}</h3>
+                <div className="flex items-center gap-2">
+                   <NeoBadge variant="black" className="text-[10px] py-0 px-2 h-5">
+                      {badge.standard?.point_value || 0} Points
+                   </NeoBadge>
+                </div>
                 <p className="text-xs font-bold opacity-70 leading-tight">
                   {badge.standard?.description || "Badge earned on " + new Date(badge.created_at).toLocaleDateString()}
                 </p>
                 <div className="mt-4">
                   {badge.tx_hash ? (
-                    <NeoBadge variant="green" className="w-full justify-center">On-Chain Verified</NeoBadge>
+                    <a 
+                      href={`https://monad-testnet.socialscan.io/tx/${badge.tx_hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <NeoBadge variant="green" className="w-full justify-center hover:opacity-80 transition-opacity cursor-pointer">
+                        View on Explorer
+                        <span className="ml-2">↗</span>
+                      </NeoBadge>
+                    </a>
                   ) : (
                     <NeoButton
                       variant="primary"

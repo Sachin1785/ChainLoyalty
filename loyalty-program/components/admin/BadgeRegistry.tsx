@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Input, Modal } from "@/components/shared/ui";
 import { Badge } from "@/lib/types";
-import { fetchAllBadges, registerBadge, uploadBadgeImage } from "@/lib/utils/api";
+import { fetchAllBadges, registerBadge, uploadBadgeImage, mintBadgeTest } from "@/lib/utils/api";
 import { Trash2, Plus, Edit2, Award, Cpu, Globe, Lock, Unlock, Zap, Star, MoreHorizontal, ChevronRight, Upload, X as CloseIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,12 +20,20 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
     name: "",
     description: "",
     metadataUri: "",
-    maxSupply: 0,
+    maxSupply: 1000,
+    pointValue: 0,
     transferable: false,
+    onchainId: undefined as number | undefined,
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Minting State
+  const [isMintModalOpen, setIsMintModalOpen] = useState(false);
+  const [mintAddress, setMintAddress] = useState("");
+  const [mintingBadge, setMintingBadge] = useState<Badge | null>(null);
+  const [isMinting, setIsMinting] = useState(false);
 
   useEffect(() => {
     loadBadges();
@@ -50,8 +58,10 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
         name: badge.name,
         description: badge.description,
         metadataUri: badge.metadataUri,
-        maxSupply: badge.maxSupply,
+        maxSupply: badge.maxSupply || 1000,
+        pointValue: badge.pointValue || 0,
         transferable: badge.transferable,
+        onchainId: badge.onchainId,
       });
     } else {
       setEditingId(null);
@@ -59,8 +69,10 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
         name: "",
         description: "",
         metadataUri: "",
-        maxSupply: 0,
+        maxSupply: 1000,
+        pointValue: 0,
         transferable: false,
+        onchainId: undefined,
       });
     }
     setPreviewUrl(badge?.metadataUri || null);
@@ -132,6 +144,33 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
     }
   };
 
+  const handleOpenMintModal = (badge: Badge) => {
+    setMintingBadge(badge);
+    setMintAddress("");
+    setIsMintModalOpen(true);
+  };
+
+  const handleMintTestNFT = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mintingBadge || !mintAddress) return;
+
+    try {
+      setIsMinting(true);
+      await mintBadgeTest({
+        to_address: mintAddress,
+        badge_id: Number(mintingBadge.id),
+        onchain_badge_type_id: mintingBadge.onchainId,
+      });
+      alert(`Successfully minted ${mintingBadge.name} to ${mintAddress}`);
+      setIsMintModalOpen(false);
+    } catch (error) {
+      console.error("Failed to mint test NFT:", error);
+      alert("Failed to mint test NFT. Check the console for details.");
+    } finally {
+      setIsMinting(false);
+    }
+  };
+
   return (
     <div className="space-y-12">
       <div className="flex items-center justify-between">
@@ -175,7 +214,13 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
                 <div className="p-8">
                    <div className="flex items-center justify-between mb-3">
                       <h3 className="text-lg font-bold tracking-tight">{badge.name}</h3>
-                      <MoreHorizontal size={18} className="text-gray-200" />
+                      <div className="flex flex-col items-end">
+                         {badge.onchainId ? (
+                            <span className="text-[8px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-bold">ON-CHAIN ID: {badge.onchainId}</span>
+                         ) : (
+                            <span className="text-[8px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-bold italic">PENDING SYNC</span>
+                         )}
+                      </div>
                    </div>
                    <p className="text-xs font-medium text-gray-400 line-clamp-2 leading-relaxed min-h-[32px] mb-6">
                      {badge.description}
@@ -183,8 +228,12 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
 
                    <div className="space-y-3 pt-6 border-t border-gray-50">
                       <div className="flex justify-between items-center text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                         <span>Value</span>
+                         <span className="text-purple-600">{badge.pointValue} Points</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] font-bold tracking-widest text-gray-400 uppercase">
                          <span>Supply Limit</span>
-                         <span className="text-gray-900">{badge.maxSupply === 0 ? "Infinite" : badge.maxSupply.toLocaleString()}</span>
+                         <span className="text-gray-900">{badge.maxSupply === 0 ? "1,000 Standard" : badge.maxSupply.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between items-center text-[10px] font-bold tracking-widest text-gray-400 uppercase">
                          <span>Transfer Type</span>
@@ -196,14 +245,24 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
 
                    <div className="flex gap-3 pt-8">
                       <button
-                        className="flex-1 h-12 bg-[#F8F7F3] rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
-                        onClick={() => handleOpenModal(badge)}
+                        className="flex-1 h-12 bg-green-50 text-green-600 rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-green-600 hover:text-white transition-all transform hover:scale-105"
+                        onClick={() => handleOpenMintModal(badge)}
+                        disabled={!badge.onchainId}
+                        title={!badge.onchainId ? "Must be synced on-chain first" : "Mint Test NFT"}
                       >
-                        <Edit2 size={12} /> Configure
+                        <Zap size={12} /> Mint Test
+                      </button>
+                      <button
+                        className="w-12 h-12 bg-[#F8F7F3] rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center hover:bg-gray-100 transition-colors"
+                        onClick={() => handleOpenModal(badge)}
+                        title="Configure"
+                      >
+                        <Edit2 size={16} className="text-gray-600" />
                       </button>
                       <button
                         className="w-12 h-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
                         onClick={() => handleDelete(badge.id)}
+                        title="Delete"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -276,10 +335,18 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
              </div>
           </div>
           <Input
-            label="Max Supply (0 = Infinite)"
+            label="Points / Discount Value"
             required
             type="number"
             min="0"
+            value={formData.pointValue}
+            onChange={(e) => setFormData({ ...formData, pointValue: parseInt(e.target.value) })}
+          />
+          <Input
+            label="Max Supply (Default 1000)"
+            required
+            type="number"
+            min="1"
             value={formData.maxSupply}
             onChange={(e) => setFormData({ ...formData, maxSupply: parseInt(e.target.value) })}
           />
@@ -297,6 +364,33 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
           </div>
           <button type="submit" className="w-full bg-black text-white rounded-[24px] py-6 font-bold text-lg hover:opacity-90 transition-opacity" disabled={loading}>
             {loading ? "Forging..." : (editingId ? "Update Protocol" : "Forge Badge Standard")}
+          </button>
+        </form>
+      </Modal>
+
+      <Modal
+        isOpen={isMintModalOpen}
+        onClose={() => setIsMintModalOpen(false)}
+        title={`Mint Test NFT: ${mintingBadge?.name}`}
+      >
+        <form onSubmit={handleMintTestNFT} className="space-y-6 pt-4">
+          <Input
+            label="Recipient Wallet Address"
+            required
+            value={mintAddress}
+            onChange={(e) => setMintAddress(e.target.value)}
+            placeholder="0x..."
+          />
+          <button 
+             type="submit" 
+             className="w-full bg-green-500 text-white rounded-[24px] py-6 font-bold text-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2" 
+             disabled={isMinting}
+          >
+            {isMinting ? "Minting to Network..." : (
+               <>
+                  <Zap size={20} /> Deploy Test Token
+               </>
+            )}
           </button>
         </form>
       </Modal>

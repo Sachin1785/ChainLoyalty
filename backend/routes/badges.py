@@ -34,6 +34,7 @@ def get_badge_metadata(badge_id: int, session: Session = Depends(get_session)):
         "image": badge.metadata_uri, # Storing the direct image URL in metadata_uri for simplicity
         "attributes": [
             {"trait_type": "Program", "value": badge.program_id},
-            {"trait_type": "Transferable", "value": "Yes" if badge.transferable else "No"}
+            {"trait_type": "Transferable", "value": "Yes" if badge.transferable else "No"},
+            {"trait_type": "Points Value", "value": badge.point_value}
         ]
     }

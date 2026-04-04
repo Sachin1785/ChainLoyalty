@@ -11,6 +11,8 @@ interface BackendBadge {
   max_supply: number;
   transferable: boolean;
   is_active: boolean;
+  onchain_id?: number;
+  point_value?: number;
 }
 
 function badgeToBackend(badge: any): BackendBadge {
@@ -20,6 +22,7 @@ function badgeToBackend(badge: any): BackendBadge {
     metadata_uri: badge.metadataUri,
     max_supply: badge.maxSupply || 0,
     transferable: badge.transferable || false,
+    point_value: badge.pointValue || 0,
     program_id: "default",
     is_active: true
   };
@@ -28,6 +31,8 @@ function badgeToBackend(badge: any): BackendBadge {
 function badgeFromBackend(b: BackendBadge): any {
   return {
     id: b.id?.toString(),
+    onchainId: b.onchain_id,
+    pointValue: b.point_value || 0,
     name: b.name,
     description: b.description,
     metadataUri: b.metadata_uri,
@@ -37,13 +42,13 @@ function badgeFromBackend(b: BackendBadge): any {
   };
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
 const USE_MOCK_API = process.env.NEXT_PUBLIC_USE_MOCK_API === "true";
 
 // --- API Clients ---
 
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE_URL.endsWith("/") ? API_BASE_URL : `${API_BASE_URL}/`,
   timeout: 30000,
 });
 
@@ -57,7 +62,7 @@ apiClient.interceptors.request.use((config) => {
 });
 
 const adminClient = axios.create({
-  baseURL: `${API_BASE_URL}/admin`,
+  baseURL: API_BASE_URL.endsWith("/") ? `${API_BASE_URL}admin/` : `${API_BASE_URL}/admin/`,
   timeout: 30000,
 });
 
@@ -109,7 +114,7 @@ const callApi = async <T>(
 
 export async function fetchUserStats(address: string) {
   return callApi(
-    () => apiClient.get(`/users/${address}/stats`),
+    () => apiClient.get(`users/${address}/stats`),
     () => mockApi.fetchUserStats(address)
   );
 }
@@ -135,7 +140,7 @@ export async function uploadBadgeImage(file: File) {
 export async function fetchAllBadges() {
   return callApi(
     async () => {
-      const res = await adminClient.get("/badges");
+      const res = await adminClient.get("badges");
       return { data: res.data.map(badgeFromBackend) };
     },
     () => mockApi.fetchAllBadges()
@@ -146,64 +151,79 @@ export async function registerBadge(badgeData: any) {
   return callApi(
     async () => {
       const payload = badgeToBackend(badgeData);
-      return adminClient.post("/badges", payload);
+      return adminClient.post(`badges`, payload);
     },
     () => mockApi.registerBadge(badgeData)
   );
 }
 
+export async function mintBadgeTest(payload: { to_address: string; badge_id: number; onchain_badge_type_id?: number }) {
+  return callApi(
+    async () => {
+      const params = new URLSearchParams();
+      params.append("wallet_address", payload.to_address);
+      params.append("badge_type_id", payload.badge_id.toString());
+      if (payload.onchain_badge_type_id !== undefined) {
+        params.append("onchain_badge_type_id", payload.onchain_badge_type_id.toString());
+      }
+      return adminClient.post(`badges/mint?${params.toString()}`);
+    },
+    async () => ({ data: { status: "success", mock: true } })
+  );
+}
+
 export async function fetchLootboxTypes() {
   return callApi(
-    () => apiClient.get(`/lootboxes`),
+    () => apiClient.get(`lootboxes`),
     () => mockApi.fetchLootboxTypes()
   );
 }
 
 export async function registerLootboxType(lootboxData: any) {
   return callApi(
-    () => apiClient.post(`/lootboxes/register`, lootboxData),
+    () => apiClient.post(`lootboxes/register`, lootboxData),
     () => mockApi.registerLootboxType(lootboxData)
   );
 }
 
 export async function fetchPrizes() {
   return callApi(
-    () => apiClient.get(`/prizes`),
+    () => apiClient.get(`prizes`),
     () => mockApi.fetchPrizes()
   );
 }
 
 export async function updatePrizeWeights(prizes: any[]) {
   return callApi(
-    () => apiClient.post(`/prizes/update-weights`, { prizes }),
+    () => apiClient.post(`prizes/update-weights`, { prizes }),
     () => mockApi.updatePrizeWeights(prizes)
   );
 }
 
 export async function commitSpin(lootboxId: string) {
   return callApi(
-    () => apiClient.post(`/spin/commit`, { lootboxId }),
+    () => apiClient.post(`spin/commit`, { lootboxId }),
     () => mockApi.commitSpin(lootboxId)
   );
 }
 
 export async function revealSpin(commitmentHash: string) {
   return callApi(
-    () => apiClient.post(`/spin/reveal`, { commitmentHash }),
+    () => apiClient.post(`spin/reveal`, { commitmentHash }),
     () => mockApi.revealSpin(commitmentHash)
   );
 }
 
 export async function claimBadge(badgeId: string) {
   return callApi(
-    () => apiClient.post(`/badges/claim`, { badgeId }),
+    () => apiClient.post(`badges/claim`, { badgeId }),
     () => mockApi.claimBadge(badgeId)
   );
 }
 
 export async function fetchAttestationProof(attestationUID: string) {
   return callApi(
-    () => apiClient.get(`/attestations/${attestationUID}`),
+    () => apiClient.get(`attestations/${attestationUID}`),
     () => mockApi.fetchAttestationProof(attestationUID)
   );
 }

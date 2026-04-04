@@ -69,6 +69,7 @@ class BadgeType(SQLModel, table=True):
     name: str = Field(unique=True)
     description: str
     metadata_uri: str
+    point_value: int = Field(default=0) # Value of the badge (points / discount)
     max_supply: int = Field(default=1000) # Default to 1000 since 0 reverts on-chain
     transferable: bool = Field(default=False)
     is_active: bool = Field(default=True)

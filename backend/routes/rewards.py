@@ -67,10 +67,10 @@ def get_user_stats(wallet_address: str, program_id: str = "default", session: Se
         "total_points": points_total,
         "redeemed_points": 0, # To be implemented with spend logic
         "badge_count": len(badges),
-        "badges": [{"id": b.id, "reward_type": b.reward_type, "amount": b.amount, "reason": b.reason, "created_at": b.created_at, "status": b.status, "certificate": b.certificate_json} for b in badges],
+        "badges": [{"id": b.id, "reward_type": b.reward_type, "amount": b.amount, "reason": b.reason, "created_at": b.created_at, "status": b.status, "tx_hash": b.tx_hash, "certificate": b.certificate_json} for b in badges],
         "referral_count": referral_count,
         "referral_code": user.referral_code,
-        "recent_activity": [{"id": a.id, "type": a.reward_type, "amount": a.amount, "reason": a.reason, "created_at": a.created_at, "status": a.status, "certificate": a.certificate_json} for a in activity]
+        "recent_activity": [{"id": a.id, "type": a.reward_type, "amount": a.amount, "reason": a.reason, "created_at": a.created_at, "status": a.status, "tx_hash": a.tx_hash, "certificate": a.certificate_json} for a in activity]
     }
 
 @router.get("/certificate/{reward_id}")
@@ -156,6 +156,21 @@ def get_claim_payload(wallet_address: str, badge_id: int, session: Session = Dep
         "nonce": payload["nonce"],
         "expires_at": payload["expiresAt"]
     }
+
+@router.post("/report-tx")
+def report_tx_hash(reward_id: int, tx_hash: str, session: Session = Depends(get_session)):
+    """
+    Update a reward record with its on-chain transaction hash.
+    """
+    reward = session.get(RewardHistory, reward_id)
+    if not reward:
+        raise HTTPException(status_code=404, detail="Reward not found")
+        
+    reward.tx_hash = tx_hash
+    reward.status = "minted" # If it was just 'claimed', now it's 'minted'
+    session.add(reward)
+    session.commit()
+    return {"status": "success"}
 
 @router.get("/{wallet_address}/history")
 def get_history(wallet_address: str, session: Session = Depends(get_session)):

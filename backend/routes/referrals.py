@@ -53,6 +53,7 @@ def verify_referral(wallet_address: str, referral_code: str, program_id: str = "
     
     try:
         # Reward Referrer
+        print(f"[referrals] Sending reward to referrer: {referrer.wallet_address}")
         tx_referrer = mint_points(referrer.wallet_address, 1000, program_id, f"Referral Success: {wallet_address[:8]}")
         from lib.blockchain import sign_reward_certificate
         ref_reward = RewardHistory(
@@ -67,8 +68,10 @@ def verify_referral(wallet_address: str, referral_code: str, program_id: str = "
         )
         session.add(ref_reward)
         rewards.append({"type": "referrer", "value": 1000, "tx": tx_referrer})
+        print(f"[referrals] Referrer reward sent: {tx_referrer}")
 
         # Reward Referee
+        print(f"[referrals] Sending reward to referee: {wallet_address}")
         tx_referee = mint_points(wallet_address, 500, program_id, f"Joined via Referral: {referral_code}")
         joint_reward = RewardHistory(
             wallet_address=wallet_address,
@@ -82,6 +85,7 @@ def verify_referral(wallet_address: str, referral_code: str, program_id: str = "
         )
         session.add(joint_reward)
         rewards.append({"type": "referee", "value": 500, "tx": tx_referee})
+        print(f"[referrals] Referee reward sent: {tx_referee}")
         
         session.commit()
     except Exception as e:

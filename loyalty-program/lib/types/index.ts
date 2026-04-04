@@ -1,5 +1,7 @@
 export interface Badge {
   id: string;
+  onchainId?: number;
+  pointValue: number;
   name: string;
   description: string;
   metadataUri: string;

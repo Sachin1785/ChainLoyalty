@@ -9,6 +9,7 @@ import threading
 
 # Global lock for transaction ordering
 tx_lock = threading.Lock()
+_next_nonce = None
 
 def sign_reward_certificate(recipient: str, amount: int, reason: str, program_id: str = "default"):
     """
@@ -91,69 +92,88 @@ def mint_points(recipient, amount, program_id="default", reason="activity"):
     """
     Mint points on-chain.
     """
+    global _next_nonce
     if not points_contract or not PRIVATE_KEY:
         print("[blockchain] Warning: Points contract or private key not configured.")
         return None
 
     with tx_lock:
-        nonce = w3.eth.get_transaction_count(account.address, 'pending')
+        if _next_nonce is None:
+            _next_nonce = w3.eth.get_transaction_count(account.address, 'pending')
+        
+        nonce = _next_nonce
+        _next_nonce += 1
+        
         uid = generate_verifiable_uid(recipient, amount, reason)
-    tx = points_contract.functions.mintPoints(
-        w3.to_checksum_address(recipient),
-        w3.to_wei(amount, 'ether'), # Assuming 18 decimals
-        program_id,
-        reason,
-        uid
-    ).build_transaction({
-        'chainId': CHAIN_ID,
-        'gas': 200000,
-        'gasPrice': w3.eth.gas_price,
-        'nonce': nonce,
-    })
+        tx = points_contract.functions.mintPoints(
+            w3.to_checksum_address(recipient),
+            w3.to_wei(amount, 'ether'), # Assuming 18 decimals
+            program_id,
+            reason,
+            uid
+        ).build_transaction({
+            'chainId': CHAIN_ID,
+            'gas': 200000,
+            'gasPrice': w3.eth.gas_price,
+            'nonce': nonce,
+        })
 
-    signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
-    tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
-    return w3.to_hex(tx_hash)
+        signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
+        tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+        return w3.to_hex(tx_hash)
 
 def spend_points(wallet, amount, program_id="default", reason="redemption"):
     """
     Burn points from a wallet on-chain (requires BURNER_ROLE).
     """
+    global _next_nonce
     if not points_contract or not PRIVATE_KEY:
         return None
 
     with tx_lock:
-        nonce = w3.eth.get_transaction_count(account.address, 'pending')
+        if _next_nonce is None:
+            _next_nonce = w3.eth.get_transaction_count(account.address, 'pending')
+            
+        nonce = _next_nonce
+        _next_nonce += 1
+        
         uid = generate_verifiable_uid(wallet, amount, reason)
-    tx = points_contract.functions.spendPoints(
-        w3.to_checksum_address(wallet),
-        w3.to_wei(amount, 'ether'),
-        program_id,
-        reason,
-        uid
-    ).build_transaction({
-        'chainId': CHAIN_ID,
-        'gas': 200000,
-        'gasPrice': w3.eth.gas_price,
-        'nonce': nonce,
-    })
+        tx = points_contract.functions.spendPoints(
+            w3.to_checksum_address(wallet),
+            w3.to_wei(amount, 'ether'),
+            program_id,
+            reason,
+            uid
+        ).build_transaction({
+            'chainId': CHAIN_ID,
+            'gas': 200000,
+            'gasPrice': w3.eth.gas_price,
+            'nonce': nonce,
+        })
 
-    signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
-    tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
-    return w3.to_hex(tx_hash)
+        signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
+        tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+        return w3.to_hex(tx_hash)
 
 def batch_mint_badges(recipients, badge_type_ids, program_id="default"):
     """
     Batch mint badges to multiple recipients (requires MINTER_ROLE).
     Waits for the receipt and raises RuntimeError if the tx reverts on-chain.
     """
+    global _next_nonce
+
     if not badge_contract or not PRIVATE_KEY:
         return None
 
     recipients_checksum = [w3.to_checksum_address(r) for r in recipients]
     uids = [b'\x00' * 32 for _ in recipients]
     with tx_lock:
-        nonce = w3.eth.get_transaction_count(account.address, 'pending')
+        if _next_nonce is None:
+            _next_nonce = w3.eth.get_transaction_count(account.address, 'pending')
+            
+        nonce = _next_nonce
+        _next_nonce += 1
+        
         tx = badge_contract.functions.batchMintBadges(
             recipients_checksum,
             badge_type_ids,
