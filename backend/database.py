@@ -64,11 +64,12 @@ class RewardHistory(SQLModel, table=True):
 
 class BadgeType(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    onchain_id: Optional[int] = Field(default=None) # The ID assigned by the smart contract
     program_id: str = Field(default="default", index=True)
     name: str = Field(unique=True)
     description: str
     metadata_uri: str
-    max_supply: int = Field(default=0) # 0 = infinite
+    max_supply: int = Field(default=1000) # Default to 1000 since 0 reverts on-chain
     transferable: bool = Field(default=False)
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)

@@ -145,6 +145,7 @@ def spend_points(wallet, amount, program_id="default", reason="redemption"):
 def batch_mint_badges(recipients, badge_type_ids, program_id="default"):
     """
     Batch mint badges to multiple recipients (requires MINTER_ROLE).
+    Waits for the receipt and raises RuntimeError if the tx reverts on-chain.
     """
     if not badge_contract or not PRIVATE_KEY:
         return None
@@ -154,20 +155,33 @@ def batch_mint_badges(recipients, badge_type_ids, program_id="default"):
     with tx_lock:
         nonce = w3.eth.get_transaction_count(account.address, 'pending')
         tx = badge_contract.functions.batchMintBadges(
-        recipients_checksum,
-        badge_type_ids,
-        uids,
-        program_id
-    ).build_transaction({
-        'chainId': CHAIN_ID,
-        'gas': 500000,
-        'gasPrice': w3.eth.gas_price,
-        'nonce': nonce,
-    })
+            recipients_checksum,
+            badge_type_ids,
+            uids,
+            program_id
+        ).build_transaction({
+            'chainId': CHAIN_ID,
+            'gas': 500000,
+            'gasPrice': w3.eth.gas_price,
+            'nonce': nonce,
+        })
 
-    signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
-    tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
-    return w3.to_hex(tx_hash)
+        signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
+        tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+
+    tx_hex = w3.to_hex(tx_hash)
+    print(f"[blockchain] batchMintBadges tx sent: {tx_hex} — waiting for receipt...")
+
+    receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=60)
+    if receipt.status != 1:
+        raise RuntimeError(
+            f"batchMintBadges reverted on-chain. tx={tx_hex}. "
+            f"Likely cause: badge type ID not registered on-chain. "
+            f"Run sync_badges_onchain.py to register badge types first."
+        )
+
+    print(f"[blockchain] batchMintBadges confirmed ✅ block={receipt.blockNumber}")
+    return tx_hex
 
 def generate_claim_signature(recipient, badge_type_id, expires_at=0):
     """
