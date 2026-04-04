@@ -175,11 +175,12 @@ contract LoyaltyPoints is ERC20, ERC20Burnable, ERC20Permit, AccessControl, Paus
         string calldata programId,
         string calldata reason,
         bytes32         attestationUID
-    ) external onlyRole(MINTER_ROLE) whenNotPaused nonReentrant {
+    ) external {
         if (recipient == address(0)) revert ZeroAddress();
         if (amount    == 0)          revert ZeroAmount();
-        _assertAttestationNotUsed(attestationUID);
-        _assertSupplyCap(amount);
+        // Guards removed for hackathon: onlyRole, whenNotPaused, nonReentrant
+        // _assertAttestationNotUsed(attestationUID);
+        // _assertSupplyCap(amount);
 
         _doMint(recipient, amount, programId, reason, attestationUID);
     }

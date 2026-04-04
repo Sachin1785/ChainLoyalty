@@ -1,0 +1,99 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
+  /* Neo-Brutalist Palette */
+  --color-neo-yellow: #FFD703;
+  --color-neo-pink: #FEBDD2;
+  --color-neo-green: #8ED670;
+  --color-neo-blue: #7CC5D9;
+  --color-neo-red: #FA5D5D;
+
+  /* Neo Shadow Tokens */
+  --shadow-neo: 4px 4px 0px 0px #000;
+  --shadow-neo-lg: 8px 8px 0px 0px #000;
+
+  /* Font */
+  --font-sans: var(--font-lexend), system-ui, sans-serif;
+}
+
+:root {
+  --background: #FFD703;
+  --foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #ffffff;
+  --accent: #FEBDD2;
+  --muted: #f3f3f3;
+  --border: #000000;
+  --radius: 0.75rem;
+}
+
+html, body {
+  color: #000;
+  background-color: #FFD703;
+  background-image: radial-gradient(rgba(0,0,0,0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.neo-card {
+  background-color: #fff;
+  border: 3px solid #000;
+  border-radius: 1rem;
+  box-shadow: 4px 4px 0px 0px #000;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.neo-card-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px 0px #000;
+}
+
+.neo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 3px solid #000;
+  border-radius: 0.75rem;
+  background-color: #fff;
+  font-weight: 700;
+  box-shadow: 4px 4px 0px 0px #000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  cursor: pointer;
+}
+
+.neo-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px 0px #000;
+}
+
+.neo-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.neo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.75rem;
+  border: 2px solid #000;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  box-shadow: 2px 2px 0 0 #000;
+}

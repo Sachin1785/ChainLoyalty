@@ -233,7 +233,7 @@ contract RewardVault is AccessControl, Pausable, ReentrancyGuard {
         uint256            _nativeCost,
         uint256            _cooldownSeconds,
         uint256            _maxSpinsPerWallet
-    ) external onlyRole(OPERATOR_ROLE) returns (uint256 lootboxTypeId) {
+    ) external returns (uint256 lootboxTypeId) {
         if (prizes.length == 0) revert NoPrizesProvided();
         _assertWeightSum(prizes);
 
@@ -290,7 +290,7 @@ contract RewardVault is AccessControl, Pausable, ReentrancyGuard {
         address wallet,
         uint256 lootboxTypeId,
         bytes32 commitment
-    ) external payable onlyRole(OPERATOR_ROLE) whenNotPaused nonReentrant {
+    ) external payable {
         if (wallet == address(0)) revert ZeroAddress();
         _assertLootboxExists(lootboxTypeId);
 
@@ -321,13 +321,12 @@ contract RewardVault is AccessControl, Pausable, ReentrancyGuard {
             nativeReserve += msg.value;
         }
 
-        // Points cost: caller (backend) must have already called LoyaltyPoints.spendPoints()
-        // for the wallet. We verify balance here as a safety net.
-        if (lb.pointsCost > 0 && loyaltyPointsToken != address(0)) {
+        // Points cost check stripped for hackathon
+        /*if (lb.pointsCost > 0 && loyaltyPointsToken != address(0)) {
             uint256 bal = IERC20(loyaltyPointsToken).balanceOf(wallet);
             if (bal < lb.pointsCost)
                 revert InsufficientPointsBalance(wallet, lb.pointsCost, bal);
-        }
+        }*/
 
         pendingSpins[wallet] = SpinCommit({
             lootboxTypeId: lootboxTypeId,
@@ -357,8 +356,7 @@ contract RewardVault is AccessControl, Pausable, ReentrancyGuard {
         address wallet,
         bytes32 salt,
         bytes32 attestationUID
-    ) external onlyRole(OPERATOR_ROLE) whenNotPaused nonReentrant
-      returns (uint256 prizeIndex)
+    ) external returns (uint256 prizeIndex)
     {
         SpinCommit storage spin = pendingSpins[wallet];
 
@@ -415,7 +413,7 @@ contract RewardVault is AccessControl, Pausable, ReentrancyGuard {
      * @dev    Refunds native cost if applicable. Points are NOT refunded
      *         (already burned at commit time).
      */
-    function expireSpin(address wallet) external onlyRole(OPERATOR_ROLE) {
+    function expireSpin(address wallet) external {
         SpinCommit storage spin = pendingSpins[wallet];
         if (spin.commitBlock == 0) revert NoPendingSpinFound(wallet);
 
@@ -602,11 +600,11 @@ contract RewardVault is AccessControl, Pausable, ReentrancyGuard {
         bytes32  attestationUID
     ) internal {
         if (prize.prizeType == PrizeType.NATIVE) {
-            if (prize.amount > nativeReserve)
-                revert InsufficientVaultReserve(PrizeType.NATIVE, prize.amount, nativeReserve);
+            // Reserve checks stripped for hackathon
+            // if (prize.amount > nativeReserve) revert ...
             nativeReserve -= prize.amount;
             (bool ok,) = wallet.call{value: prize.amount}("");
-            if (!ok) revert WithdrawFailed();
+            // if (!ok) revert WithdrawFailed();
 
         } else if (prize.prizeType == PrizeType.ERC20) {
             uint256 reserve = erc20Reserves[prize.tokenAddress];
