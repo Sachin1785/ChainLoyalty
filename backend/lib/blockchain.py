@@ -5,6 +5,10 @@ from eth_account import Account
 from eth_account.messages import encode_typed_data, encode_defunct
 import hashlib
 import time
+import threading
+
+# Global lock for transaction ordering
+tx_lock = threading.Lock()
 
 def sign_reward_certificate(recipient: str, amount: int, reason: str, program_id: str = "default"):
     """
@@ -91,10 +95,11 @@ def mint_points(recipient, amount, program_id="default", reason="activity"):
         print("[blockchain] Warning: Points contract or private key not configured.")
         return None
 
-    nonce = w3.eth.get_transaction_count(account.address)
-    uid = generate_verifiable_uid(recipient, amount, reason)
+    with tx_lock:
+        nonce = w3.eth.get_transaction_count(account.address, 'pending')
+        uid = generate_verifiable_uid(recipient, amount, reason)
     tx = points_contract.functions.mintPoints(
-        recipient,
+        w3.to_checksum_address(recipient),
         w3.to_wei(amount, 'ether'), # Assuming 18 decimals
         program_id,
         reason,
@@ -117,10 +122,11 @@ def spend_points(wallet, amount, program_id="default", reason="redemption"):
     if not points_contract or not PRIVATE_KEY:
         return None
 
-    nonce = w3.eth.get_transaction_count(account.address)
-    uid = generate_verifiable_uid(wallet, amount, reason)
+    with tx_lock:
+        nonce = w3.eth.get_transaction_count(account.address, 'pending')
+        uid = generate_verifiable_uid(wallet, amount, reason)
     tx = points_contract.functions.spendPoints(
-        wallet,
+        w3.to_checksum_address(wallet),
         w3.to_wei(amount, 'ether'),
         program_id,
         reason,
@@ -143,10 +149,12 @@ def batch_mint_badges(recipients, badge_type_ids, program_id="default"):
     if not badge_contract or not PRIVATE_KEY:
         return None
 
+    recipients_checksum = [w3.to_checksum_address(r) for r in recipients]
     uids = [b'\x00' * 32 for _ in recipients]
-    nonce = w3.eth.get_transaction_count(account.address)
-    tx = badge_contract.functions.batchMintBadges(
-        recipients,
+    with tx_lock:
+        nonce = w3.eth.get_transaction_count(account.address, 'pending')
+        tx = badge_contract.functions.batchMintBadges(
+        recipients_checksum,
         badge_type_ids,
         uids,
         program_id
@@ -168,7 +176,8 @@ def generate_claim_signature(recipient, badge_type_id, expires_at=0):
     if not badge_contract or not PRIVATE_KEY:
         return None
 
-    nonce = badge_contract.functions.nonces(recipient).call()
+    recipient_checksum = w3.to_checksum_address(recipient)
+    nonce = badge_contract.functions.nonces(recipient_checksum).call()
     
     # Message data
     attestation_uid = b'\x00' * 32

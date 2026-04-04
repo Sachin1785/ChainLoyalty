@@ -15,6 +15,9 @@ def get_user_stats(wallet_address: str, program_id: str = "default", session: Se
     """
     Get aggregated loyalty stats for a user (Points, Badges, Referrals, Activity).
     """
+    from lib.blockchain import w3
+    wallet_address = w3.to_checksum_address(wallet_address)
+    
     user = session.exec(select(User).where(User.wallet_address == wallet_address, User.program_id == program_id)).first()
     if not user:
         # Create user automatically on first dashboard visit
@@ -159,6 +162,9 @@ def get_history(wallet_address: str, session: Session = Depends(get_session)):
     """
     Get detailed reward history for a user.
     """
+    from lib.blockchain import w3
+    wallet_address = w3.to_checksum_address(wallet_address)
+    
     history = session.exec(
         select(RewardHistory)
         .where(RewardHistory.wallet_address == wallet_address)

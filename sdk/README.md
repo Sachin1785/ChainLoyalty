@@ -34,7 +34,18 @@ import { useRewardBalance } from "loyaltychain-sdk";
 const rewards = useRewardBalance(client, walletAddress);
 ```
 
-## Embeddable Components
+## Widgets & Components
+
+This SDK includes several drop-in React components that can be used to add loyalty features to your site in seconds.
+
+| Component | Documentation | Description |
+| :--- | :--- | :--- |
+| **SpinWidget** | [docs/SpinWidget.md](docs/SpinWidget.md) | Interactive on-chain reward wheel. |
+| **Leaderboard** | [docs/Leaderboard.md](docs/Leaderboard.md) | Rankings with podiums and theming. |
+| **ReferralWidget** | [docs/ReferralWidget.md](docs/ReferralWidget.md) | Code generation and copy-to-clipboard. |
+| **RewardsDashboard** | [docs/RewardsDashboard.md](docs/RewardsDashboard.md) | Balances and activity history. |
+
+## Quick Start
 
 ```tsx
 import { Leaderboard, RewardsDashboard } from "loyaltychain-sdk";

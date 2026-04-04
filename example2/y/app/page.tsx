@@ -1,90 +1,98 @@
-"use client"
-import Image from "next/image";
-import { ConnectMetaMaskSIWEButton } from "loyaltychain-sdk/components/ConnectMetaMaskSIWEButton";
-import { useState } from "react";
+"use client";
+import React, { useState, useMemo } from "react";
+import {
+  ChainLoyaltyClient,
+  SpinWidget,
+  Leaderboard,
+  ReferralWidget,
+  RewardsDashboard,
+  ConnectWalletButton,
+} from "loyaltychain-sdk";
 
 export default function Home() {
-  const [siweAddress, setSiweAddress] = useState<string | null>(null);
-  const [siweJwt, setSiweJwt] = useState<string | null>(null);
-  // Replace with your actual SIWE backend API URL
-  const siweApiUrl = process.env.NEXT_PUBLIC_SIWE_API_URL ?? "http://localhost:4000";
+  const [walletAddress, setWalletAddress] = useState<string>("");
+
+  const client = useMemo(() => new ChainLoyaltyClient({
+    baseUrl: "http://localhost:8000",
+    apiKey: "test-api-key",
+  }), []);
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-[#f1f5f9] p-8 font-sans">
+      <header className="max-w-6xl mx-auto mb-12 flex items-center justify-between">
+        <div>
+          <h1 className="text-5xl font-black uppercase tracking-tighter text-black">Loyalty SDK <span className="text-[#FFD703]">DEMO</span></h1>
+          <p className="font-bold text-gray-500">Testing our Neo-Brutalism SDK components</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+        <div className="flex flex-col items-end gap-2">
+          <ConnectWalletButton 
+            onConnect={(addr) => setWalletAddress(addr)}
+            label={walletAddress ? `Connected: ${walletAddress.slice(0, 6)}...` : "Connect to Demo"}
+          />
+          {walletAddress && (
+            <button 
+              onClick={() => setWalletAddress("")}
+              className="text-xs font-black underline uppercase hover:text-red-500"
+            >
+              Sign out
+            </button>
+          )}
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column - Dashboard & Referral */}
+        <div className="lg:col-span-8 flex flex-col gap-8">
+          <RewardsDashboard 
+            client={client} 
+            walletAddress={walletAddress} 
+            title="Account Snapshot" 
+            onConnect={setWalletAddress}
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <ReferralWidget 
+              client={client} 
+              walletAddress={walletAddress} 
+              theme={{ background: "#ffffff" }}
+              onConnect={setWalletAddress}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[8px_8px_0_0_black] flex flex-col justify-center items-center text-center">
+              <h3 className="font-black text-xl uppercase mb-2">More coming soon</h3>
+              <p className="font-bold text-gray-500 text-sm">We are porting more components daily!</p>
+            </div>
+          </div>
+
+          <SpinWidget 
+            client={client} 
+            walletAddress={walletAddress} 
+            title="The Grand Prize Wheel"
+            theme={{ 
+              cardBase: "#ffffff",
+              wheelColors: ["#FFD703", "#FEBDD2", "#A7F3D0", "#FFEDD5"] 
+            }}
+            onConnect={setWalletAddress}
+          />
         </div>
-        <ConnectMetaMaskSIWEButton
-          siweApiUrl={siweApiUrl}
-          onConnect={(address, jwt) => {
-            setSiweAddress(address);
-            setSiweJwt(jwt);
-          }}
-        />
-        {siweAddress && (
-          <div className="mt-4 text-green-700">
-            Connected as: {siweAddress}
-          </div>
-        )}
-        {siweJwt && (
-          <div className="mt-2 text-xs text-gray-500 break-all">
-            JWT: {siweJwt}
-          </div>
-        )}
+
+        {/* Right Column - Leaderboard */}
+        <div className="lg:col-span-4">
+          <Leaderboard 
+            client={client} 
+            title="Top Rankers"
+            showPodium={true} 
+            theme={{ 
+              accent: "#FFD703",
+              border: "#000000",
+              shadow: "4px 4px 0 0 black"
+            }}
+          />
+        </div>
       </main>
+      
+      <footer className="max-w-6xl mx-auto mt-20 border-t-4 border-black pt-8 pb-16 opacity-50">
+        <p className="font-black uppercase tracking-widest text-sm">© 2026 ChainLoyalty - Built with Antigravity Agentic SDK</p>
+      </footer>
     </div>
   );
 }

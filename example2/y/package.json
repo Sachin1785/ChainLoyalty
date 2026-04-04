@@ -9,18 +9,19 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.96.2",
     "next": "16.2.2",
     "react": "^19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "loyaltychain-sdk": "file:../../sdk/loyaltychain-sdk-0.1.0.tgz",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "loyaltychain-sdk": "file:../../sdk/loyaltychain-sdk-0.1.0.tgz",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

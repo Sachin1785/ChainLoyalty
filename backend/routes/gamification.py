@@ -60,6 +60,9 @@ def commit_spin(wallet_address: str, lootbox_id: int, session: Session = Depends
     if not vault_contract or not PRIVATE_KEY:
         raise HTTPException(status_code=500, detail="RewardVault not configured")
 
+    from lib.blockchain import w3
+    wallet_address = w3.to_checksum_address(wallet_address)
+    
     # 1. Check and spend points if necessary
     try:
         config = vault_contract.functions.getLootboxConfig(lootbox_id).call()
@@ -98,29 +101,34 @@ def commit_spin(wallet_address: str, lootbox_id: int, session: Session = Depends
             session.commit()
     except Exception as e:
         if isinstance(e, HTTPException): raise e
+        print(f"[gamification] Cost verification failed: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Cost verification failed: {str(e)}")
 
     # 2. Generate salt and commitment
     # commitment = keccak256(abi.encodePacked(salt, wallet))
     salt = secrets.token_bytes(32)
-    commitment = w3.solidity_keccak(['bytes32', 'address'], [salt, wallet_address])
+    wallet_checksum = w3.to_checksum_address(wallet_address)
+    commitment = w3.solidity_keccak(['bytes32', 'address'], [salt, wallet_checksum])
     
+    from lib.blockchain import tx_lock
     # 3. Call commitSpin on contract via operator role
     try:
-        nonce = w3.eth.get_transaction_count(account.address)
-        tx = vault_contract.functions.commitSpin(
-            w3.to_checksum_address(wallet_address),
-            lootbox_id,
-            commitment
-        ).build_transaction({
-            'chainId': CHAIN_ID,
-            'gas': 300000,
-            'gasPrice': w3.eth.gas_price,
-            'nonce': nonce,
-        })
+        with tx_lock:
+            nonce = w3.eth.get_transaction_count(account.address, 'pending')
+            tx = vault_contract.functions.commitSpin(
+                wallet_checksum,
+                lootbox_id,
+                commitment
+            ).build_transaction({
+                'chainId': CHAIN_ID,
+                'gas': 300000,
+                'gasPrice': w3.eth.gas_price,
+                'nonce': nonce,
+            })
 
-        signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
-        tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+            signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
+            tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+
         
         return {
             "status": "committed",
@@ -129,6 +137,7 @@ def commit_spin(wallet_address: str, lootbox_id: int, session: Session = Depends
             "wallet": wallet_address
         }
     except Exception as e:
+        print(f"[gamification] Commit transaction failed: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Commit failed: {str(e)}")
 
 @router.post("/spin/reveal")
@@ -141,22 +150,24 @@ def reveal_spin(wallet_address: str, salt_hex: str):
 
     try:
         salt = bytes.fromhex(salt_hex)
-        nonce = w3.eth.get_transaction_count(account.address)
-        
-        # attestation_uid = 0 bytes
-        tx = vault_contract.functions.revealSpin(
-            w3.to_checksum_address(wallet_address),
-            salt,
-            b'\x00' * 32
-        ).build_transaction({
-            'chainId': CHAIN_ID,
-            'gas': 400000,
-            'gasPrice': w3.eth.gas_price,
-            'nonce': nonce,
-        })
+        from lib.blockchain import tx_lock
+        with tx_lock:
+            nonce = w3.eth.get_transaction_count(account.address, 'pending')
+            
+            # attestation_uid = 0 bytes
+            tx = vault_contract.functions.revealSpin(
+                w3.to_checksum_address(wallet_address),
+                salt,
+                b'\x00' * 32
+            ).build_transaction({
+                'chainId': CHAIN_ID,
+                'gas': 400000,
+                'gasPrice': w3.eth.gas_price,
+                'nonce': nonce,
+            })
 
-        signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
-        tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+            signed_tx = w3.eth.account.sign_transaction(tx, private_key=PRIVATE_KEY)
+            tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
         
         # 1. Wait for receipt and parse event (Monad is fast!)
         receipt = w3.eth.wait_for_transaction_receipt(tx_hash)

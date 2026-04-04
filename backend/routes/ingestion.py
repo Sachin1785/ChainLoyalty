@@ -18,6 +18,9 @@ def ingest_event(wallet_address: str, event_type: str, program_id: str = "defaul
     Ingest a product event and evaluate it against rules.
     Supports multi-tenancy via program_id.
     """
+    from lib.blockchain import w3
+    wallet_address = w3.to_checksum_address(wallet_address)
+    
     # 1. Ensure user exists or create them
     user = session.exec(select(User).where(User.wallet_address == wallet_address, User.program_id == program_id)).first()
     if not user:

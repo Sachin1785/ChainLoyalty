@@ -100,3 +100,27 @@ export interface ReferralCreateResponse {
   referralCode: string;
   referralLink: string;
 }
+
+export interface LootboxPrize {
+  type: string;
+  amount: number;
+  label: string;
+  weight_bps: number;
+  color?: string;
+}
+
+export interface LootboxConfig {
+  name: string;
+  points_cost: number;
+  cooldown: number;
+  prizes: LootboxPrize[];
+}
+
+export interface SpinCommitResponse {
+  salt: string;
+}
+
+export interface SpinRevealResponse {
+  prize_label: string;
+  tx_hash: string;
+}
