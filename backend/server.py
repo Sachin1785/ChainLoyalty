@@ -46,15 +46,17 @@ def on_startup():
     print("[app] Database initialized.")
 
 # ── CORS ───────────────────────────────────────────────────────────────────────
-# NOTE: allow_credentials=True is incompatible with allow_origins=["*"].
-# We list explicit origins + regexes to cover ngrok and Vercel deployments.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ── Static Files ──────────────────────────────────────────────────────────────
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 # ── Auto-discover and mount all routers from routes/ ──────────────────────────

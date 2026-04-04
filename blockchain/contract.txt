@@ -1,0 +1,5 @@
+﻿Deploying SimpleBadge with account: 0x210f0257A119ede458d5985893527cE434518B9e
+Account balance: 24390629392826125421
+Deploying SimpleBadge contract...
+SimpleBadge deployed to: 0x377d6eB8787d3AD3fDba74Fb8c3B019F1A14c749
+Check the explorer to verify!

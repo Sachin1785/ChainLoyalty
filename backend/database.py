@@ -61,3 +61,14 @@ class RewardHistory(SQLModel, table=True):
     status: str = Field(default="earned") # "earned", "minted", "claimed", "spent"
     certificate_json: Optional[Dict[str, Any]] = Field(default=None, sa_type=JSON)
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class BadgeType(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    program_id: str = Field(default="default", index=True)
+    name: str = Field(unique=True)
+    description: str
+    metadata_uri: str
+    max_supply: int = Field(default=0) # 0 = infinite
+    transferable: bool = Field(default=False)
+    is_active: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
