@@ -1,0 +1,77 @@
+{
+  "name": "loyaltychain-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK and React hooks/components for ChainLoyalty API",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./components/ConnectMetaMaskSIWEButton": {
+      "types": "./dist/components/ConnectMetaMaskSIWEButton.d.ts",
+      "import": "./dist/components/ConnectMetaMaskSIWEButton.js",
+      "require": "./dist/components/ConnectMetaMaskSIWEButton.cjs"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js",
+      "require": "./dist/client/index.cjs"
+    },
+    "./hooks": {
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.js",
+      "require": "./dist/hooks/index.cjs"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js",
+      "require": "./dist/components/index.cjs"
+    },
+    "./components/CopyCodeButton": {
+      "types": "./dist/components/CopyCodeButton.d.ts",
+      "import": "./dist/components/CopyCodeButton.js",
+      "require": "./dist/components/CopyCodeButton.cjs"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "viem": "^2.47.10",
+    "wagmi": "^3.6.0"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "^5.96.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.5.4"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5",
+    "react": ">=18",
+    "react-dom": ">=18"
+  }
+}
