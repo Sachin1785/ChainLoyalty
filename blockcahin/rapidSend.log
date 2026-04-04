@@ -1,0 +1,10 @@
+Tx 10 failed: could not coalesce error (error={ "code": -32007, "message": "25/second request limit reached - reduce calls per second or upgrade your account at https://dashboard.quicknode.com/billing/plan" }, payload={ "id": 29, "jsonrpc": "2.0", "method": "eth_sendRawTransaction", "params": [ "0x02f89782279f3e8477359400852f082364008283a0941988d621f5c2286dac735eb8019726f718294cfe865af3107a4000a48a7644a800000000000000000000000095498dde2b2f9a05b02e3f7bd87e5d96313d5bcdc001a0a892cd45ffe9c2c7338e79c9c5f674924e5cf9f2e29e17cb22dbfbcd900a52f8a075373d09816ed67056b57a754f8ebc8f997ca2ce996b95d83915a4f521c040c4" ] }, code=UNKNOWN_ERROR, version=6.13.5)
+Tx 1 sent: 0xce307093460727de2eb3c33b876667fabeddb73ecfcf1138a8372c8bd0323264
+Tx 2 sent: 0xe3a61a82860c2c51cbae15817c6a0886ce6e6bdc61872e03171f621caadfdc95
+Tx 3 sent: 0x2d3923d68a1c12af330bd713f4a156878c22dd41d444c15708f2373bea744c11
+Tx 4 sent: 0x606d8f4cb1ce264d08033c39c1799fc1afc3710adeadb33f0c96e404fcc4ff10
+Tx 5 sent: 0x21bcdd605dc9138a2d89ed551de9ed0199b3954476172d7845de30bb69f3e746
+Tx 6 sent: 0x3fd48fb481d02d21c8a239b9fa9941295cf7a4c658d28a58b73f3f5f8b3f4107
+Tx 7 sent: 0x8f732d170cd640956c77cb108fc32aae5ae5961d77750d42e525ef6ee714e5dd
+Tx 8 sent: 0x09e21f8cdc412658c73b2ff768401c2d2c475ce7b718f4e91b5be738f98cef54
+Tx 9 sent: 0x1e60fea3d65dc7b8563e111085cbab1d90783092cacea2696eba4ce1418737c3
