@@ -5,6 +5,7 @@ import { CartProvider } from '@/lib/cart-context'
 import { Web3Provider } from '@/components/web3-provider'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
+import { LoyaltyWidget } from '@/components/loyalty-widget'
 import './globals.css'
 
 const playfairDisplay = Playfair_Display({ 
@@ -55,6 +56,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            <LoyaltyWidget />
           </CartProvider>
         </Web3Provider>
         {process.env.NODE_ENV === 'production' && <Analytics />}

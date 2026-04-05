@@ -29,7 +29,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       // 1. If referral code is provided, verify it first
       if (referralCode.trim() !== '') {
         try {
-          const refRes = await fetch(`http://127.0.0.1:8000/api/v1/referrals/verify?wallet_address=${address}&referral_code=${referralCode}&program_id=brewbound`, {
+          const refRes = await fetch(`http://127.0.0.1:8000/api/v1/referrals/verify?wallet_address=${address}&referral_code=${referralCode}&program_id=default`, {
             method: "POST"
           });
           if (refRes.ok) {
@@ -41,7 +41,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       }
 
       // 2. Process the order event
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/events?wallet_address=${address}&event_type=COFFEE_ORDER&program_id=brewbound`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/v1/events?wallet_address=${address}&event_type=COFFEE_ORDER&program_id=default`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: totalAmount }),
