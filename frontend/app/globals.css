@@ -14,7 +14,7 @@
   --color-border: var(--border);
 
   /* Neo-Brutalist Palette */
-  --color-neo-yellow: #FFD703;
+  --color-neo-yellow: #B8F0C8;
   --color-neo-pink: #FEBDD2;
   --color-neo-green: #8ED670;
   --color-neo-blue: #7CC5D9;
@@ -29,7 +29,7 @@
 }
 
 :root {
-  --background: #FFD703;
+  --background: #B8F0C8;
   --foreground: #000000;
   --primary: #000000;
   --primary-foreground: #ffffff;
@@ -42,7 +42,7 @@
 
 html, body {
   color: #000;
-  background-color: #FFD703;
+  background-color: #B8F0C8;
   background-image: radial-gradient(rgba(0,0,0,0.08) 1px, transparent 1px);
   background-size: 20px 20px;
   font-family: var(--font-sans);

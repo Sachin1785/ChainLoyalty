@@ -15,12 +15,12 @@ const BADGE_PERKS = [
   { match: (r: string) => r.toLowerCase().includes('platinum'), emoji: '💎', label: 'Platinum Legend', perk: '25% off + Early Access', source: 'Stride', color: 'from-cyan-400 to-blue-600' },
 ];
 
-const MILESTONE_REWARDS = [
-  { workouts: 5, emoji: '🔥', label: 'Streak Starter', reward: '+150 bonus pts', locked: false, requirement: '5 workouts posted' },
-  { workouts: 30, emoji: '🥉', label: 'Bronze Athlete', reward: '10% off Supplements', locked: true, requirement: '30 workouts' },
-  { workouts: 60, emoji: '🥈', label: 'Silver Athlete', reward: '15% off Equipment', locked: true, requirement: '60 workouts' },
-  { workouts: 100, emoji: '🥇', label: 'Gold Athlete', reward: '20% off Everything', locked: true, requirement: '100 workouts' },
-  { workouts: 200, emoji: '💎', label: 'Platinum Legend', reward: '25% + Early Access', locked: true, requirement: '200 workouts' },
+const MILESTONE_DEFS = [
+  { emoji: '🔥', label: 'Streak Starter',  requirement: '5 workouts posted',  reward: '+150 bonus pts',       badgeKey: null       },
+  { emoji: '🥉', label: 'Bronze Athlete',  requirement: '30 workouts',         reward: '10% off Supplements',  badgeKey: 'bronze'   },
+  { emoji: '🥈', label: 'Silver Athlete',  requirement: '60 workouts',         reward: '15% off Equipment',    badgeKey: 'silver'   },
+  { emoji: '🥇', label: 'Gold Athlete',    requirement: '100 workouts',        reward: '20% off Everything',   badgeKey: 'gold'     },
+  { emoji: '💎', label: 'Platinum Legend', requirement: '200 workouts',        reward: '25% + Early Access',   badgeKey: 'platinum' },
 ];
 
 export default function RewardsPage() {
@@ -72,8 +72,19 @@ export default function RewardsPage() {
   const totalPoints = brewPoints + stridePoints;
 
   const uniqueBadges = activeBadges.filter(
-    (b, i, arr) => arr.findIndex(x => x.perk.label === b.perk.label) === i
+    (b: any, i: number, arr: any[]) => arr.findIndex((x: any) => x.perk.label === b.perk.label) === i
   );
+
+  // Derive which milestones are unlocked from real badge data
+  const earnedBadgeKeys = new Set(
+    activeBadges
+      .filter((b: any) => b.perk.source === 'Stride')
+      .map((b: any) => b.perk.label.toLowerCase())
+  );
+  const milestones = MILESTONE_DEFS.map(m => ({
+    ...m,
+    unlocked: m.badgeKey === null ? totalPoints > 0 : earnedBadgeKeys.has(m.label.toLowerCase()),
+  }));
 
   return (
     <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
@@ -228,16 +239,16 @@ export default function RewardsPage() {
             </h2>
             <p className="text-sm text-muted-foreground mb-6">Complete workout milestones to unlock permanent discount badges.</p>
             <div className="space-y-4">
-              {MILESTONE_REWARDS.map((m, i) => (
+              {milestones.map((m, i) => (
                 <div
                   key={i}
                   className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
-                    m.locked
-                      ? 'border-border bg-muted/20 opacity-70'
-                      : 'border-primary/30 bg-primary/5'
+                    m.unlocked
+                      ? 'border-primary/30 bg-primary/5'
+                      : 'border-border bg-muted/20 opacity-70'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${m.locked ? 'grayscale' : ''}`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${!m.unlocked ? 'grayscale' : ''}`}>
                     {m.emoji}
                   </div>
                   <div className="flex-1">
@@ -245,10 +256,10 @@ export default function RewardsPage() {
                     <p className="text-xs text-muted-foreground">{m.requirement}</p>
                     <p className="text-xs font-bold text-primary mt-0.5">{m.reward}</p>
                   </div>
-                  {m.locked ? (
-                    <Lock size={16} className="text-muted-foreground flex-shrink-0" />
+                  {m.unlocked ? (
+                    <span className="text-[10px] font-black text-green-700 bg-green-100 px-2 py-1 rounded-full whitespace-nowrap">Earned ✓</span>
                   ) : (
-                    <span className="text-[10px] font-black text-green-700 bg-green-100 px-2 py-1 rounded-full">Earned</span>
+                    <Lock size={16} className="text-muted-foreground flex-shrink-0" />
                   )}
                 </div>
               ))}

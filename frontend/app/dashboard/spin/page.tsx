@@ -26,7 +26,7 @@ export default function SpinPage() {
   const [salt, setSalt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const colors = ["#FFD703", "#FEBDD2", "#8ED670", "#e5e7eb", "#7CC5D9", "#FA5D5D"];
+  const colors = ["#B8F0C8", "#FEBDD2", "#8ED670", "#e5e7eb", "#7CC5D9", "#FA5D5D"];
 
   useEffect(() => {
     fetch(`${API_BASE}/gamification/lootbox/1/config`)
@@ -176,7 +176,7 @@ export default function SpinPage() {
           </div>
 
           <div className="h-8 flex flex-col items-center gap-1">
-            {phase === "committing" && <NeoBadge variant="yellow">🔒 Locking Commitment...</NeoBadge>}
+            {phase === "committing" && <NeoBadge variant="green">🔒 Locking Commitment...</NeoBadge>}
             {phase === "waiting" && <NeoBadge variant="pink">⏳ Waiting for blockhash...</NeoBadge>}
             {phase === "revealing" && <NeoBadge variant="blue">🎲 Revealing Prize...</NeoBadge>}
           </div>

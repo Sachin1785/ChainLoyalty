@@ -77,12 +77,9 @@ const LOCK_BADGES = [
 ];
 
 const PRODUCTS = [
-  { id: 1, name: 'Premium Protein Powder', category: 'Supplements', price: 49.99, rating: 4.8, emoji: '🧪', desc: 'Whey isolate, 25g protein per serving' },
-  { id: 2, name: 'Resistance Bands Set', category: 'Equipment', price: 34.99, rating: 4.9, emoji: '💪', desc: '5-band progressive resistance set' },
-  { id: 3, name: 'Elite Workout Apparel', category: 'Clothing', price: 89.99, rating: 4.7, emoji: '👕', desc: 'Moisture-wicking performance fabric' },
-  { id: 4, name: 'Foam Roller Pro', category: 'Recovery', price: 44.99, rating: 4.6, emoji: '🔵', desc: 'Deep tissue muscle recovery' },
-  { id: 5, name: 'Hydration Bottle 1L', category: 'Accessories', price: 24.99, rating: 4.5, emoji: '💧', desc: 'Insulated stainless steel design' },
-  { id: 6, name: 'Performance Tracker Watch', category: 'Tech', price: 199.99, rating: 4.9, emoji: '⌚', desc: 'Heart rate, GPS, sleep tracking' },
+  { id: 1, name: 'Premium Protein Powder', category: 'Supplements', price: 49.99, rating: 4.8, image: 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&q=80&w=800', desc: 'Whey isolate, 25g protein per serving' },
+  { id: 4, name: 'Foam Roller Pro', category: 'Recovery', price: 44.99, rating: 4.6, image: 'https://images.unsplash.com/photo-1600881333168-2ef49b341f30?auto=format&fit=crop&q=80&w=800', desc: 'Deep tissue muscle recovery' },
+  { id: 5, name: 'Hydration Bottle 1L', category: 'Accessories', price: 24.99, rating: 4.5, image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&q=80&w=800', desc: 'Insulated stainless steel design' },
 ];
 
 const CATEGORIES = ['All', 'Supplements', 'Equipment', 'Clothing', 'Recovery', 'Accessories', 'Tech'];
@@ -162,7 +159,7 @@ export default function Store() {
         price: product.price,
         discountedPrice: discountedPrice ?? undefined,
         quantity: 1,
-        emoji: product.emoji,
+        image: product.image,
         description: product.desc,
       },
     });
@@ -293,8 +290,8 @@ export default function Store() {
                 className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col"
               >
                 {/* Product Image Area */}
-                <div className="relative h-48 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                  <span className="text-7xl">{product.emoji}</span>
+                <div className="relative h-48 bg-muted flex items-center justify-center overflow-hidden">
+                  <img src={product.image} alt={product.name} className="w-full h-full object-cover mix-blend-multiply" />
                   <div className="absolute top-3 left-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold">
                     {product.category}
                   </div>

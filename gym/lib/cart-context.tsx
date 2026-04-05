@@ -8,7 +8,7 @@ export interface CartItem {
   price: number;         // base price
   discountedPrice?: number; // badge-discounted price if applicable
   quantity: number;
-  emoji: string;
+  image: string;
   description?: string;
 }
 

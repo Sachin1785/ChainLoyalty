@@ -174,10 +174,8 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   exit={{ opacity: 0, x: 20 }}
                   className="flex gap-4 p-4 bg-card rounded-2xl border border-border hover:border-primary/30 transition-colors"
                 >
-                  {/* Emoji Icon */}
-                  <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
-                    {item.emoji}
-                  </div>
+                  {/* Product Image */}
+                  <img src={item.image} alt={item.name} className="w-12 h-12 object-cover bg-muted rounded-xl flex-shrink-0" />
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
