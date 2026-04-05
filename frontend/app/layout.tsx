@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'ReactBits - Beautiful React Components',
-  description: 'A curated collection of accessible, customizable React components built with Tailwind CSS and Radix UI.',
+  title: 'LoyaltyKit - SDK Components for Loyalty & Web3',
+  description: 'Drop-in SDK widgets for loyalty programs, gamification, and Web3 wallet experiences.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -41,8 +41,19 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="font-sans antialiased">
+    <html lang="en" data-theme="dark">
+      {/* Anti-flash: apply stored theme before first paint */}
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            try {
+              var t = localStorage.getItem('lk-theme') || 'dark';
+              document.documentElement.setAttribute('data-theme', t);
+            } catch(e) {}
+          })()
+        ` }} />
+      </head>
+      <body className="font-sans antialiased" style={{ background: 'var(--lk-bg)', color: 'var(--lk-text)', margin: 0 }}>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

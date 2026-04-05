@@ -3,59 +3,63 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { COMPONENT_REGISTRY } from '@/lib/component-registry'
-import { cn } from '@/lib/utils'
+import { ThemeToggle } from '@/components/theme-provider'
 
 export function DocsSidebar() {
   const pathname = usePathname()
-  
-  // Group components by category
-  const categories = Array.from(
-    new Set(COMPONENT_REGISTRY.map(c => c.category))
-  ).sort()
+  const categories = Array.from(new Set(COMPONENT_REGISTRY.map(c => c.category))).sort()
 
   return (
-    <aside className="w-64 border-r border-white/10 bg-black/40 backdrop-blur-sm overflow-y-auto flex-shrink-0">
-      <div className="sticky top-0 px-6 py-8">
-        <Link 
-          href="/docs"
-          className="flex items-center gap-2 mb-8 group"
-        >
-          <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm group-hover:shadow-lg group-hover:shadow-cyan-500/50 transition-all">
-            RB
+    <aside style={{
+      width: 256,
+      flexShrink: 0,
+      overflowY: 'auto',
+      backdropFilter: 'blur(12px)',
+      background: 'var(--lk-sidebar-bg)',
+      borderRight: '1px solid var(--lk-border)',
+    }}>
+      <div style={{ position: 'sticky', top: 0, padding: '32px 24px 16px' }}>
+        {/* Logo */}
+        <Link href="/docs" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, textDecoration: 'none' }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+            background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontWeight: 700, fontSize: 12,
+          }}>
+            LK
           </div>
-          <span className="font-semibold text-white">ReactBits</span>
+          <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--lk-text)' }}>LoyaltyKit</span>
         </Link>
-        
-        <p className="text-sm text-white/60 mb-6">Components Library</p>
+
+        {/* Subtitle + toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+          <span style={{ fontSize: 12, color: 'var(--lk-text-muted)' }}>SDK Components</span>
+          <ThemeToggle />
+        </div>
       </div>
 
-      <nav className="px-4 space-y-8">
+      <nav style={{ padding: '0 16px 32px' }}>
         {categories.map(category => {
-          const componentsInCategory = COMPONENT_REGISTRY.filter(
-            c => c.category === category
-          )
-          
+          const items = COMPONENT_REGISTRY.filter(c => c.category === category)
           return (
-            <div key={category}>
-              <h3 className="text-xs font-semibold uppercase text-white/40 px-2 mb-3">
+            <div key={category} style={{ marginBottom: 28 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--lk-text-faint)', padding: '0 8px', marginBottom: 8 }}>
                 {category}
-              </h3>
-              <ul className="space-y-1">
-                {componentsInCategory.map(component => {
-                  const isActive = pathname === `/docs/${component.slug}`
-                  
+              </p>
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                {items.map(comp => {
+                  const isActive = pathname === `/docs/${comp.slug}`
                   return (
-                    <li key={component.slug}>
-                      <Link
-                        href={`/docs/${component.slug}`}
-                        className={cn(
-                          'block px-3 py-2 rounded-lg text-sm transition-all',
-                          isActive
-                            ? 'bg-white/10 text-white font-medium'
-                            : 'text-white/70 hover:text-white hover:bg-white/5'
-                        )}
-                      >
-                        {component.title}
+                    <li key={comp.slug}>
+                      <Link href={`/docs/${comp.slug}`} style={{
+                        display: 'block', padding: '7px 12px', borderRadius: 8, fontSize: 13,
+                        textDecoration: 'none', transition: 'all 0.15s',
+                        color: isActive ? 'var(--lk-accent)' : 'var(--lk-text-muted)',
+                        background: isActive ? 'var(--lk-surface-active)' : 'transparent',
+                        fontWeight: isActive ? 600 : 400,
+                      }}>
+                        {comp.title}
                       </Link>
                     </li>
                   )

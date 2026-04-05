@@ -1,7 +1,5 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-
 interface Prop {
   name: string
   type: string
@@ -9,40 +7,35 @@ interface Prop {
   default?: string
 }
 
-interface PropsTableProps {
-  props: Prop[]
-}
-
-export function PropsTable({ props }: PropsTableProps) {
+export function PropsTable({ props }: { props: Prop[] }) {
   if (!props || props.length === 0) return null
 
+  const cellBase: React.CSSProperties = { padding: '10px 16px', fontSize: 13 }
+  const headCell: React.CSSProperties = { ...cellBase, fontWeight: 600, color: 'var(--lk-text)', textAlign: 'left' }
+
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/10">
-      <table className="w-full text-sm">
-        <thead className="bg-white/5 border-b border-white/10">
+    <div style={{ overflowX: 'auto', borderRadius: 12, border: '1px solid var(--lk-border)' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <thead style={{ background: 'var(--lk-surface)', borderBottom: '1px solid var(--lk-border)' }}>
           <tr>
-            <th className="px-4 py-3 text-left font-semibold text-white">Property</th>
-            <th className="px-4 py-3 text-left font-semibold text-white">Type</th>
-            <th className="px-4 py-3 text-left font-semibold text-white">Description</th>
-            <th className="px-4 py-3 text-left font-semibold text-white">Default</th>
+            <th style={headCell}>Property</th>
+            <th style={headCell}>Type</th>
+            <th style={headCell}>Description</th>
+            <th style={headCell}>Default</th>
           </tr>
         </thead>
         <tbody>
           {props.map((prop, idx) => (
             <tr
               key={prop.name}
-              className={cn(
-                'border-t border-white/5 transition-colors',
-                idx % 2 === 0 ? 'bg-transparent' : 'bg-white/[0.02]',
-                'hover:bg-white/5'
-              )}
+              style={{ borderTop: '1px solid var(--lk-divider)', background: idx % 2 === 1 ? 'var(--lk-surface)' : 'transparent', transition: 'background 0.15s' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--lk-surface-hover)')}
+              onMouseLeave={e => (e.currentTarget.style.background = idx % 2 === 1 ? 'var(--lk-surface)' : 'transparent')}
             >
-              <td className="px-4 py-3 font-mono text-cyan-400">{prop.name}</td>
-              <td className="px-4 py-3 font-mono text-white/70 text-xs">{prop.type}</td>
-              <td className="px-4 py-3 text-white/70">{prop.description}</td>
-              <td className="px-4 py-3 font-mono text-white/50 text-xs">
-                {prop.default || '-'}
-              </td>
+              <td style={{ ...cellBase, fontFamily: 'monospace', color: 'var(--lk-accent)', fontWeight: 600 }}>{prop.name}</td>
+              <td style={{ ...cellBase, fontFamily: 'monospace', color: 'var(--lk-text-muted)', fontSize: 12 }}>{prop.type}</td>
+              <td style={{ ...cellBase, color: 'var(--lk-text-muted)' }}>{prop.description}</td>
+              <td style={{ ...cellBase, fontFamily: 'monospace', color: 'var(--lk-text-faint)', fontSize: 12 }}>{prop.default || '—'}</td>
             </tr>
           ))}
         </tbody>

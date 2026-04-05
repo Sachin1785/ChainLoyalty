@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CodeBlock } from './code-block'
 import { ExampleRegistry } from '@/lib/example-registry'
 import { COMPONENT_THEME_CONFIG } from '@/lib/theme-config'
@@ -17,109 +16,144 @@ export function ComponentPreview({ component, slug, code, title }: ComponentPrev
   const [tab, setTab] = useState<'preview' | 'code'>('preview')
 
   const tokenDefs = slug ? (COMPONENT_THEME_CONFIG[slug] ?? []) : []
-
-  // Build initial theme state from defaults
-  const initialTheme = Object.fromEntries(tokenDefs.map((t) => [t.key, t.default]))
+  const initialTheme = Object.fromEntries(tokenDefs.map(t => [t.key, t.default]))
   const [theme, setTheme] = useState<Record<string, string>>(initialTheme)
 
   const handleColorChange = useCallback((key: string, value: string) => {
-    setTheme((prev) => ({ ...prev, [key]: value }))
+    setTheme(prev => ({ ...prev, [key]: value }))
   }, [])
 
   const handleReset = useCallback(() => {
-    setTheme(Object.fromEntries(tokenDefs.map((t) => [t.key, t.default])))
+    setTheme(Object.fromEntries(tokenDefs.map(t => [t.key, t.default])))
   }, [tokenDefs])
 
   const ComponentToRender = slug ? ExampleRegistry[slug] : null
   const hasTheme = tokenDefs.length > 0
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {title && (
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        <h3 style={{ fontSize: 17, fontWeight: 600, color: 'var(--lk-text)', margin: 0 }}>{title}</h3>
       )}
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as 'preview' | 'code')} className="w-full">
-        <TabsList className="w-full bg-white/5 border border-white/10 p-1">
-          <TabsTrigger
-            value="preview"
-            className="flex-1 text-white/60 hover:text-white/80 data-[state=active]:bg-white/10 data-[state=active]:text-white"
+      {/* ── Tab bar ── */}
+      <div style={{
+        display: 'inline-flex', gap: 2,
+        background: 'var(--lk-surface)',
+        border: '1px solid var(--lk-border)',
+        borderRadius: 10, padding: 3,
+        width: 'fit-content',
+      }}>
+        {(['preview', 'code'] as const).map(t => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            style={{
+              padding: '6px 20px', borderRadius: 7, fontSize: 13, fontWeight: tab === t ? 600 : 400,
+              border: 'none', cursor: 'pointer', transition: 'all 0.15s',
+              background: tab === t ? 'var(--lk-tab-active-bg)' : 'transparent',
+              color: tab === t ? 'var(--lk-text)' : 'var(--lk-tab-text)',
+            }}
           >
-            Preview
-          </TabsTrigger>
-          <TabsTrigger
-            value="code"
-            className="flex-1 text-white/60 hover:text-white/80 data-[state=active]:bg-white/10 data-[state=active]:text-white"
-          >
-            Code
-          </TabsTrigger>
-        </TabsList>
+            {t === 'preview' ? 'Preview' : 'Code'}
+          </button>
+        ))}
+      </div>
 
-        <TabsContent value="preview" className="mt-4 min-h-[500px] relative">
-
-          {/* Color Palette Panel */}
+      {/* ── Preview Tab ── */}
+      {tab === 'preview' && (
+        <div style={{
+          borderRadius: 14,
+          border: '1.5px solid var(--lk-border-strong)',
+          overflow: 'hidden',
+          boxShadow: 'var(--lk-shadow)',
+        }}>
+          {/* Palette bar */}
           {slug && hasTheme && (
-            <div className="mb-3 flex flex-wrap items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-3">
-              <span className="text-xs font-semibold text-white/50 uppercase tracking-widest mr-1">Theme</span>
-              {tokenDefs.map((token) => (
-                <label
-                  key={token.key}
-                  className="flex items-center gap-1.5 cursor-pointer group"
-                  title={token.key}
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10,
+              background: 'var(--lk-surface)',
+              borderBottom: '1px solid var(--lk-border)',
+              padding: '10px 16px',
+            }}>
+              <span style={{
+                fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                letterSpacing: '0.1em', color: 'var(--lk-text-faint)', marginRight: 4,
+              }}>
+                Theme
+              </span>
+              {tokenDefs.map(token => (
+                <label key={token.key} title={token.key}
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer' }}
                 >
-                  {/* Swatch acts as the color picker trigger */}
-                  <span
-                    className="relative w-6 h-6 rounded-md border-2 border-white/20 group-hover:border-white/50 transition-colors overflow-hidden shadow-sm flex-shrink-0"
-                    style={{ background: theme[token.key] }}
-                  >
+                  <span style={{
+                    position: 'relative', width: 20, height: 20, borderRadius: 5,
+                    flexShrink: 0, display: 'block', overflow: 'hidden',
+                    background: theme[token.key],
+                    border: '1.5px solid var(--lk-border-strong)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+                  }}>
                     <input
                       type="color"
                       value={theme[token.key]}
-                      onChange={(e) => handleColorChange(token.key, e.target.value)}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      onChange={e => handleColorChange(token.key, e.target.value)}
+                      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
                     />
                   </span>
-                  <span className="text-xs text-white/60 group-hover:text-white/90 transition-colors whitespace-nowrap">
+                  <span style={{ fontSize: 11, color: 'var(--lk-text-muted)', whiteSpace: 'nowrap' }}>
                     {token.label}
                   </span>
                 </label>
               ))}
               <button
                 onClick={handleReset}
-                className="ml-auto text-xs text-white/40 hover:text-white/80 transition-colors px-2 py-1 rounded hover:bg-white/10"
-                title="Reset to defaults"
+                style={{
+                  marginLeft: 'auto', fontSize: 11, color: 'var(--lk-text-faint)',
+                  background: 'transparent', border: 'none', cursor: 'pointer',
+                  padding: '2px 8px', borderRadius: 5,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--lk-text)'; e.currentTarget.style.background = 'var(--lk-surface-hover)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--lk-text-faint)'; e.currentTarget.style.background = 'transparent' }}
               >
                 Reset
               </button>
             </div>
           )}
 
-          <div
-            className="rounded-xl border border-white/20 p-8 min-h-[500px] overflow-auto relative flex items-center justify-center"
-            style={{
-              backgroundImage: 'radial-gradient(circle at 1.5px 1.5px, rgba(255, 255, 255, 0.15) 1.5px, transparent 0)',
-              backgroundSize: '24px 24px',
-              backgroundColor: '#0a0a0a',
-            }}
-          >
-            <div className="w-full min-h-[400px] flex items-center justify-center relative">
+          {/* Canvas */}
+          <div style={{
+            minHeight: 480, overflow: 'auto',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 32,
+            backgroundImage: `radial-gradient(circle at 1.5px 1.5px, var(--lk-preview-dot) 1.5px, transparent 0)`,
+            backgroundSize: '24px 24px',
+            backgroundColor: 'var(--lk-preview-bg)',
+          }}>
+            <div style={{ width: '100%', minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {ComponentToRender ? (
-                <div className="w-full">
-                  <ComponentToRender theme={theme} />
-                </div>
+                <div style={{ width: '100%' }}><ComponentToRender theme={theme} /></div>
               ) : component ? (
-                <div className="w-full">{component}</div>
+                <div style={{ width: '100%' }}>{component}</div>
               ) : (
-                <div className="text-white/50 text-sm">Live preview not available for this component.</div>
+                <p style={{ color: 'var(--lk-text-faint)', fontSize: 14 }}>Live preview not available.</p>
               )}
             </div>
           </div>
-        </TabsContent>
+        </div>
+      )}
 
-        <TabsContent value="code" className="mt-4 min-h-[500px]">
+      {/* ── Code Tab ── */}
+      {tab === 'code' && (
+        <div style={{
+          borderRadius: 14,
+          border: '1.5px solid var(--lk-border-strong)',
+          overflow: 'hidden',
+          minHeight: 480,
+          boxShadow: 'var(--lk-shadow)',
+        }}>
           <CodeBlock code={code} language="tsx" />
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   )
 }

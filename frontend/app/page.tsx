@@ -17,9 +17,9 @@ export default function Home() {
         <nav className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-              RB
+              LK
             </div>
-            <span className="font-semibold text-white">LoyaltyChain</span>
+            <span className="font-semibold text-white">LoyaltyKit</span>
           </div>
           <Link href="/docs">
             <Button variant="outline" className="gap-2">
@@ -38,12 +38,12 @@ export default function Home() {
           </div>
           
           <h1 className="text-6xl md:text-7xl font-bold text-white text-balance leading-tight">
-            React Components Done Right
+            Loyalty UI Components, Done Right
           </h1>
           
           <p className="text-xl text-white/70 text-balance">
-            A curated collection of accessible, customizable React components 
-            built with Tailwind CSS and Radix UI. Copy, paste, and customize to your needs.
+            A curated SDK component library for loyalty programs, gamification and
+            Web3 wallet experiences. Drop-in widgets with full theme customization.
           </p>
 
           <div className="flex items-center justify-center gap-4 pt-8">
@@ -99,7 +99,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-white/10 backdrop-blur-sm bg-black/50">
         <div className="max-w-7xl mx-auto px-8 py-8 text-center text-white/50 text-sm">
-          <p>ReactBits • Beautiful React Components for Modern Web Apps</p>
+          <p>LoyaltyKit • SDK Components for Loyalty & Web3 Apps</p>
         </div>
       </footer>
     </div>

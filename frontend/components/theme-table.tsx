@@ -1,40 +1,35 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-
 interface ThemeVariable {
   variable: string
   description: string
 }
 
-interface ThemeTableProps {
-  variables: ThemeVariable[]
-}
-
-export function ThemeTable({ variables }: ThemeTableProps) {
+export function ThemeTable({ variables }: { variables: ThemeVariable[] }) {
   if (!variables || variables.length === 0) return null
 
+  const cellBase: React.CSSProperties = { padding: '10px 16px', fontSize: 13 }
+  const headCell: React.CSSProperties = { ...cellBase, fontWeight: 600, color: 'var(--lk-text)', textAlign: 'left' }
+
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/10">
-      <table className="w-full text-sm">
-        <thead className="bg-white/5 border-b border-white/10">
+    <div style={{ overflowX: 'auto', borderRadius: 12, border: '1px solid var(--lk-border)' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <thead style={{ background: 'var(--lk-surface)', borderBottom: '1px solid var(--lk-border)' }}>
           <tr>
-            <th className="px-4 py-3 text-left font-semibold text-white">Variable</th>
-            <th className="px-4 py-3 text-left font-semibold text-white">Description</th>
+            <th style={headCell}>Variable</th>
+            <th style={headCell}>Description</th>
           </tr>
         </thead>
         <tbody>
           {variables.map((item, idx) => (
             <tr
               key={item.variable}
-              className={cn(
-                'border-t border-white/5 transition-colors',
-                idx % 2 === 0 ? 'bg-transparent' : 'bg-white/[0.02]',
-                'hover:bg-white/5'
-              )}
+              style={{ borderTop: '1px solid var(--lk-divider)', background: idx % 2 === 1 ? 'var(--lk-surface)' : 'transparent', transition: 'background 0.15s' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--lk-surface-hover)')}
+              onMouseLeave={e => (e.currentTarget.style.background = idx % 2 === 1 ? 'var(--lk-surface)' : 'transparent')}
             >
-              <td className="px-4 py-3 font-mono text-blue-400">{item.variable}</td>
-              <td className="px-4 py-3 text-white/70">{item.description}</td>
+              <td style={{ ...cellBase, fontFamily: 'monospace', color: 'var(--lk-badge-text)', fontWeight: 600 }}>{item.variable}</td>
+              <td style={{ ...cellBase, color: 'var(--lk-text-muted)' }}>{item.description}</td>
             </tr>
           ))}
         </tbody>
