@@ -13,7 +13,7 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/v1/rewards/leaderboard")
+    fetch("http://127.0.0.1:8000/api/v1/rewards/leaderboard")
       .then(r => r.json())
       .then(data => {
         setLeaders(data);

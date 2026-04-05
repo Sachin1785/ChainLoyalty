@@ -108,7 +108,7 @@ export function BadgeRegistry({ onRefresh }: BadgeRegistryProps) {
         setIsUploading(true);
         try {
           const uploadResp = await uploadBadgeImage(selectedFile);
-          finalMetadataUri = `http://localhost:8000${uploadResp.url}`;
+          finalMetadataUri = `http://127.0.0.1:8000${uploadResp.url}`;
         } finally {
           setIsUploading(false);
         }

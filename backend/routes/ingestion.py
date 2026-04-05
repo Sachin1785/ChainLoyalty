@@ -73,26 +73,32 @@ def ingest_event(wallet_address: str, event_type: str, program_id: str = "defaul
             # 1. Prepare reward entry
             tx_hash = None
             status = "earned"
-            
+            actual_reward_value = rule.reward_value
+
+            if "points_multiplier" in condition and rule.reward_type == "points":
+                amount = float(metadata.get("amount", 0))
+                multiplier = float(condition["points_multiplier"])
+                actual_reward_value = int(amount * multiplier)
+
             if rule.reward_type == "points":
                 # Trigger on-chain mint
-                tx_hash = mint_points(wallet_address, rule.reward_value, program_id, f"Rule: {rule.name}")
+                tx_hash = mint_points(wallet_address, actual_reward_value, program_id, f"Rule: {rule.name}")
                 status = "minted" if tx_hash else "earned"
             elif rule.reward_type == "badge" and rule.automatic_mint:
                 # Trigger on-chain badge mint (Direct-to-Wallet)
                 from lib.blockchain import batch_mint_badges
-                tx_hash = batch_mint_badges([wallet_address], [rule.reward_value], program_id)
+                tx_hash = batch_mint_badges([wallet_address], [actual_reward_value], program_id)
                 status = "minted" if tx_hash else "earned"
 
             # Generate off-chain certificate
             from lib.blockchain import sign_reward_certificate
-            certificate = sign_reward_certificate(wallet_address, rule.reward_value, f"Rule: {rule.name}", program_id)
+            certificate = sign_reward_certificate(wallet_address, actual_reward_value, f"Rule: {rule.name}", program_id)
 
             reward = RewardHistory(
                 wallet_address=wallet_address,
                 program_id=program_id,
                 reward_type=rule.reward_type,
-                amount=rule.reward_value,
+                amount=actual_reward_value,
                 reason=f"Rule triggered: {rule.name}",
                 tx_hash=tx_hash,
                 status=status,
@@ -101,7 +107,7 @@ def ingest_event(wallet_address: str, event_type: str, program_id: str = "defaul
             session.add(reward)
             triggered_rewards.append({
                 "type": rule.reward_type,
-                "value": rule.reward_value,
+                "value": actual_reward_value,
                 "name": rule.name,
                 "tx_hash": tx_hash
             })

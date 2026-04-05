@@ -1,0 +1,112 @@
+import type { Product } from '@/components/product-card';
+
+export const products: (Product & { category: string })[] = [
+  {
+    id: '1',
+    name: 'Ethiopian Yirgacheffe',
+    price: 16.99,
+    image: 'https://tse3.mm.bing.net/th/id/OIP.3ZfTY5ljQPdgspoQGDBV_wHaLL?pid=Api&P=0&h=220',
+    description: 'Bright, fruity notes with hints of blueberry and bergamot',
+    rating: 5,
+    reviews: 48,
+    featured: true,
+    size: '12 oz',
+    category: 'Coffee',
+  },
+  {
+    id: '2',
+    name: 'Colombian Geisha',
+    price: 24.99,
+    image: 'https://thumbs.dreamstime.com/z/coffee-beans-tea-leaves-same-plate-cup-half-grain-arabica-aromatic-sort-drink-black-mix-breakfast-caffeine-porcelain-156108684.jpg',
+    description: 'Rare and exquisite with jasmine, citrus, and floral notes',
+    rating: 5,
+    reviews: 32,
+    featured: true,
+    size: '12 oz',
+    category: 'Beans',
+  },
+  {
+    id: '3',
+    name: 'Kenyan AA',
+    price: 18.99,
+    image: 'https://png.pngtree.com/png-clipart/20230425/original/pngtree-americano-coffee-beans-transparent-white-background-png-image_9097377.png',
+    description: 'Bold, complex with blackcurrant, wine, and cocoa undertones',
+    rating: 4,
+    reviews: 25,
+    size: '12 oz',
+    category: 'Coffee',
+  },
+  {
+    id: '4',
+    name: 'Brazilian Santos',
+    price: 14.99,
+    image: 'https://cdn.pixabay.com/photo/2024/06/26/06/58/ai-generated-8854172_1280.jpg',
+    description: 'Smooth and balanced with chocolate and hazelnut notes',
+    rating: 5,
+    reviews: 56,
+    size: '12 oz',
+    category: 'Beans',
+  },
+  {
+    id: '5',
+    name: 'Costa Rican Tarrazú',
+    price: 17.99,
+    image: 'https://tse1.mm.bing.net/th/id/OIP.-KWsgpTlOrEla4puM77_MwHaE-?pid=Api&P=0&h=220',
+    description: 'Rich, full-bodied with dark chocolate and spice flavors',
+    rating: 4,
+    reviews: 19,
+    size: '12 oz',
+    category: 'Equipment',
+  },
+  {
+    id: '6',
+    name: 'Sumatra Mandheling',
+    price: 15.99,
+    image: 'https://img.freepik.com/premium-photo/south-indian-filter-coffee-served-traditional-brass-stainless-steel-cup_466689-90126.jpg?w=2000',
+    description: 'Deep, earthy with herbal notes and low acidity',
+    rating: 5,
+    reviews: 41,
+    size: '12 oz',
+    category: 'Coffee',
+  },
+  {
+    id: '7',
+    name: 'Organic Green Tea',
+    price: 12.99,
+    image: 'https://tse3.mm.bing.net/th/id/OIP.p7qLCGY_aQJ56vCGeV5_nQHaEO?pid=Api&P=0&h=220',
+    description: 'Pure, refreshing green tea with delicate flavor',
+    rating: 4,
+    reviews: 23,
+    size: '100g',
+    category: 'Teas',
+  },
+  {
+    id: '8',
+    name: 'Espresso Machine',
+    price: 199.99,
+    image: 'https://images.unsplash.com/photo-1620189507195-68309c04c4d0?w=800&q=80',
+    description: 'Professional-grade espresso maker for home use',
+    rating: 5,
+    reviews: 67,
+    featured: true,
+    category: 'Equipment',
+  },
+  {
+    id: '9',
+    name: 'Chocolate Croissant',
+    price: 5.99,
+    image: 'https://images.unsplash.com/photo-1600521853186-93b88b3a07b0?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    description: 'Fresh-baked with rich dark chocolate, flaky on the outside.',
+    rating: 5,
+    reviews: 34,
+    category: 'Pastries',
+  },
+];
+
+export function getProductById(id: string): Product | undefined {
+  return products.find(p => p.id === id);
+}
+
+export function getRelatedProducts(id: string, limit = 3): Product[] {
+  return products.filter(p => p.id !== id).slice(0, limit);
+}

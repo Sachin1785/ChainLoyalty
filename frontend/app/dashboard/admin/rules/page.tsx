@@ -6,7 +6,7 @@ import { NeoButton } from "@/components/ui/NeoButton";
 import { NeoBadge } from "@/components/ui/NeoBadge";
 import { Plus, Trash2, Settings, Save } from "lucide-react";
 
-const API_BASE = "http://localhost:8000/api/v1";
+const API_BASE = "http://127.0.0.1:8000/api/v1";
 
 export default function AdminRulesPage() {
   const [rules, setRules] = useState<any[]>([]);

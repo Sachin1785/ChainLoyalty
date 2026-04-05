@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Star, Trophy, Users, TrendingUp, Zap, Copy, Check } from "lucide-react";
 import Link from "next/link";
 
-const API_BASE = "http://localhost:8000/api/v1";
+const API_BASE = "http://127.0.0.1:8000/api/v1";
 
 interface ActivityItem { 
   id: number; 

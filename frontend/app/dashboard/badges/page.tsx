@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import badgeAbi from "@/lib/abis/LoyaltyBadge.json";
 
-const API_BASE = "http://localhost:8000/api/v1";
+const API_BASE = "http://127.0.0.1:8000/api/v1";
 const LOYALTY_BADGE_ADDR = process.env.NEXT_PUBLIC_LOYALTY_BADGE_ADDR as `0x${string}`;
 
 interface BadgeInstance {
