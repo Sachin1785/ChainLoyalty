@@ -46,48 +46,57 @@ def verify_referral(wallet_address: str, referral_code: str, program_id: str = "
 
     session.commit()
     
-    # 4. Trigger Rewards (On-chain)
-    # Referrer reward: 1000 points
-    # Referee reward: 500 points
+    # 4. Trigger Rewards (On-chain) based on Rules
+    # We look for a rule with event_type="REFERRAL" and program_id
+    referral_rule = session.exec(select(Rule).where(
+        Rule.event_type == "REFERRAL",
+        Rule.program_id == program_id,
+        Rule.is_active == True
+    )).first()
+    
+    # Default values if no rule exists
+    reward_amount = referral_rule.reward_value if referral_rule else 500
+    
     rewards = []
     
     try:
-        # Reward Referrer
-        print(f"[referrals] Sending reward to referrer: {referrer.wallet_address}")
-        tx_referrer = mint_points(referrer.wallet_address, 1000, program_id, f"Referral Success: {wallet_address[:8]}")
         from lib.blockchain import sign_reward_certificate
+        
+        # Reward Referrer
+        print(f"[referrals] Sending {reward_amount} points to referrer: {referrer.wallet_address}")
+        tx_referrer = mint_points(referrer.wallet_address, reward_amount, program_id, f"Referral Success: {wallet_address[:8]}")
         ref_reward = RewardHistory(
             wallet_address=referrer.wallet_address,
             program_id=program_id,
             reward_type="points",
-            amount=1000,
+            amount=reward_amount,
             reason=f"Referral Bonus for inviting {wallet_address[:8]}",
             tx_hash=tx_referrer,
             status="minted",
-            certificate_json=sign_reward_certificate(referrer.wallet_address, 1000, f"Referral: {wallet_address[:8]}", program_id)
+            certificate_json=sign_reward_certificate(referrer.wallet_address, reward_amount, f"Referral: {wallet_address[:8]}", program_id)
         )
         session.add(ref_reward)
-        rewards.append({"type": "referrer", "value": 1000, "tx": tx_referrer})
-        print(f"[referrals] Referrer reward sent: {tx_referrer}")
+        rewards.append({"type": "referrer", "value": reward_amount, "tx": tx_referrer})
 
         # Reward Referee
-        print(f"[referrals] Sending reward to referee: {wallet_address}")
-        tx_referee = mint_points(wallet_address, 500, program_id, f"Joined via Referral: {referral_code}")
+        print(f"[referrals] Sending {reward_amount} points to referee: {wallet_address}")
+        tx_referee = mint_points(wallet_address, reward_amount, program_id, f"Joined via Referral: {referral_code}")
         joint_reward = RewardHistory(
             wallet_address=wallet_address,
             program_id=program_id,
             reward_type="points",
-            amount=500,
+            amount=reward_amount,
             reason=f"Sign-up Bonus via Referral {referral_code}",
             tx_hash=tx_referee,
             status="minted",
-            certificate_json=sign_reward_certificate(wallet_address, 500, f"Referral: {referral_code}", program_id)
+            certificate_json=sign_reward_certificate(wallet_address, reward_amount, f"Referral: {referral_code}", program_id)
         )
         session.add(joint_reward)
-        rewards.append({"type": "referee", "value": 500, "tx": tx_referee})
-        print(f"[referrals] Referee reward sent: {tx_referee}")
+        rewards.append({"type": "referee", "value": reward_amount, "tx": tx_referee})
         
         session.commit()
+    except Exception as e:
+        print(f"[referrals] Reward minting failed: {e}")
     except Exception as e:
         print(f"[referrals] Reward minting failed: {e}")
 

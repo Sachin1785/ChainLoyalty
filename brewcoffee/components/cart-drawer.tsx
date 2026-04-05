@@ -1,8 +1,9 @@
 'use client';
 
 import { useCart } from '@/lib/cart-context';
-import { X, Plus, Minus, Trash2 } from 'lucide-react';
+import { X, Plus, Minus, Trash2, Wallet, Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
 
 export interface CartDrawerProps {
   isOpen: boolean;
@@ -11,29 +12,45 @@ export interface CartDrawerProps {
 
 export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { state, dispatch } = useCart();
+  const { address, isConnected } = useAccount();
   const [mounted, setMounted] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   // handle checkout using the loyalty backend
   const handleCheckout = async (totalAmount: number) => {
+    if (!isConnected || !address) {
+      alert("Please connect your wallet to proceed!");
+      return;
+    }
+    
     setIsCheckingOut(true);
     try {
-      if (walletAddress.trim() !== '') {
-        const response = await fetch(`http://127.0.0.1:8000/api/v1/events?wallet_address=${walletAddress}&event_type=COFFEE_ORDER&program_id=default`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: totalAmount }),
-        });
-        
-        if (!response.ok) {
-           throw new Error("Failed to process loyalty reward");
+      // 1. If referral code is provided, verify it first
+      if (referralCode.trim() !== '') {
+        try {
+          const refRes = await fetch(`http://127.0.0.1:8000/api/v1/referrals/verify?wallet_address=${address}&referral_code=${referralCode}&program_id=brewbound`, {
+            method: "POST"
+          });
+          if (refRes.ok) {
+            console.log("Referral verified successfully!");
+          }
+        } catch (err) {
+          console.warn("Referral verification failed, continuing with order", err);
         }
-        alert(`Order successful! You earned loyalty points for spending ₹${totalAmount.toFixed(2)}.`);
-      } else {
-        alert("Order successful! (No loyalty points claimed).");
       }
+
+      // 2. Process the order event
+      const response = await fetch(`http://127.0.0.1:8000/api/v1/events?wallet_address=${address}&event_type=COFFEE_ORDER&program_id=brewbound`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: totalAmount }),
+      });
       
+      if (!response.ok) {
+         throw new Error("Failed to process loyalty reward");
+      }
+      alert(`Order successful! You earned loyalty points to your wallet ${address.slice(0,6)}...`);
       dispatch({ type: 'CLEAR_CART' });
       onClose();
     } catch (e) {
@@ -186,14 +203,30 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </div>
             </div>
 
-            {/* Wallet Address for Loyalty */}
-            <div className="space-y-1 mt-2 mb-2">
-               <label className="text-xs text-muted-foreground font-semibold">Web3 Wallet Address (Earn Points!)</label>
+            {/* Wallet Integration Status */}
+            <div className="space-y-1 mb-2">
+               <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Wallet Connection</label>
+               {isConnected ? (
+                 <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-md text-green-700 text-sm">
+                    <Check size={14} />
+                    <span>Using MetaMask: <strong>{address?.slice(0,6)}...{address?.slice(-4)}</strong></span>
+                 </div>
+               ) : (
+                 <div className="p-2 border border-blue-200 bg-blue-50 rounded-md text-blue-700 text-sm flex items-center gap-2">
+                    <Wallet size={14} />
+                    <span>Please connect your wallet in the header!</span>
+                 </div>
+               )}
+            </div>
+            
+            {/* Referral Code (Optional) */}
+            <div className="space-y-1 mt-2 mb-4">
+               <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Referral Code (Optional)</label>
                <input 
                  type="text" 
-                 placeholder="0x..." 
-                 value={walletAddress}
-                 onChange={(e) => setWalletAddress(e.target.value)}
+                 placeholder="CHAIN-XXXXXX" 
+                 value={referralCode}
+                 onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
                  className="w-full p-2 border border-border bg-background rounded-md text-sm text-foreground focus:ring-accent focus:border-accent"
                />
             </div>
@@ -201,9 +234,9 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             {/* Checkout Button */}
             <button 
               onClick={() => handleCheckout(total)}
-              disabled={isCheckingOut}
-              className="w-full py-3 bg-accent text-accent-foreground font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50">
-              {isCheckingOut ? "Processing..." : "Proceed to Checkout"}
+              disabled={isCheckingOut || !isConnected}
+              className="w-full py-3 bg-accent text-accent-foreground font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:bg-muted">
+              {!isConnected ? "Connect Wallet to Order" : (isCheckingOut ? "Processing..." : "Proceed to Checkout")}
             </button>
 
             {/* Continue Shopping */}

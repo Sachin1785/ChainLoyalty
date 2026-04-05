@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Playfair_Display, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/lib/cart-context'
+import { Web3Provider } from '@/components/web3-provider'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import './globals.css'
@@ -47,13 +48,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${playfairDisplay.variable} ${inter.variable}`}>
       <body className="font-sans antialiased flex flex-col min-h-screen">
-        <CartProvider>
-          <Header />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </CartProvider>
+        <Web3Provider>
+          <CartProvider>
+            <Header />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </CartProvider>
+        </Web3Provider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

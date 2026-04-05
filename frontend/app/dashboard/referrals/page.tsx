@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { NeoCard } from "@/components/ui/NeoCard";
 import { NeoButton } from "@/components/ui/NeoButton";
 import { NeoBadge } from "@/components/ui/NeoBadge";
-import { Copy, Check, Users, Star, Share2 } from "lucide-react";
+import { Copy, Check, Users, Star, Share2, MessageSquare } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 const API_BASE = "http://127.0.0.1:8000/api/v1";
@@ -51,17 +51,22 @@ export default function ReferralsPage() {
     }
   };
 
+  const shareToBluesky = () => {
+    const text = encodeURIComponent(`Join ChainLoyalty and earn exclusive rewards! My referral code: ${referralCode}`);
+    window.open(`https://bsky.app/intent/compose?text=${text}`, "_blank");
+  };
+
   const verifyReferral = async () => {
     if (!verifyCode.trim() || !address) return;
     setVerifying(true);
     setVerifyResult(null);
     try {
-      const res = await fetch(`${API_BASE}/referrals/verify?wallet_address=${address}&referral_code=${verifyCode}`, {
+      const res = await fetch(`${API_BASE}/referrals/verify?wallet_address=${address}&referral_code=${verifyCode}&program_id=default`, {
         method: "POST"
       });
       const data = await res.json();
       if (res.ok) {
-        setVerifyResult({ success: true, message: "Referral applied! +200 pts added." });
+        setVerifyResult({ success: true, message: "Referral applied! Bonus points added to your wallet." });
       } else {
         setVerifyResult({ success: false, message: data.detail || "Invalid code" });
       }
@@ -100,8 +105,8 @@ export default function ReferralsPage() {
           <p className="font-black text-xs uppercase tracking-widest mt-1">Active</p>
         </NeoCard>
         <NeoCard className="p-6 bg-neo-pink text-center" hover={false}>
-          <p className="font-black text-4xl">{totalEarned}</p>
-          <p className="font-black text-xs uppercase tracking-widest mt-1">Pts Earned</p>
+          <p className="font-black text-4xl">CHECK ON-CHAIN</p>
+          <p className="font-black text-xs uppercase tracking-widest mt-1">Total Rewards Earned</p>
         </NeoCard>
       </div>
 
@@ -111,13 +116,22 @@ export default function ReferralsPage() {
           <h2 className="text-xl font-black uppercase mb-4 flex items-center gap-2">
             <Share2 size={20} /> Share Your Code
           </h2>
-          <div className="bg-neo-white border-4 border-black rounded-xl p-4 flex items-center justify-between shadow-[6px_6px_0_0_black] mb-6">
-            <span className="font-black text-2xl tracking-[0.2em]">{referralCode || "LOADING..."}</span>
-            <button onClick={copy} className="p-2 hover:scale-110 transition-transform">
-              {copied ? <Check size={22} className="text-green-600" /> : <Copy size={22} />}
+          <div className="flex gap-4">
+            <div className="flex-1 bg-neo-white border-4 border-black rounded-xl p-4 flex items-center justify-between shadow-[6px_6px_0_0_black]">
+              <span className="font-black text-2xl tracking-[0.2em]">{referralCode || "LOADING..."}</span>
+              <button onClick={copy} title="Copy Code" className="p-2 hover:scale-110 transition-transform">
+                {copied ? <Check size={22} className="text-green-600" /> : <Copy size={22} />}
+              </button>
+            </div>
+            <button 
+              onClick={shareToBluesky}
+              className="bg-[#0085FF] border-4 border-black rounded-xl p-4 shadow-[6px_6px_0_0_black] hover:-translate-y-1 transition-all flex items-center justify-center text-white"
+              title="Share on Bluesky"
+            >
+              <MessageSquare size={24} fill="white" />
             </button>
           </div>
-          <p className="font-bold text-sm">Your friend enters this code at signup and you <strong>both</strong> earn <strong>200 points</strong>.</p>
+          <p className="font-bold text-sm mt-6">Share your code! You and your friend both earn <strong>Bonus Loyalty Points</strong> instantly.</p>
         </NeoCard>
 
         {/* Enter a Referral Code */}
@@ -165,7 +179,7 @@ export default function ReferralsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <span className="font-black text-sm">+200 pts</span>
+                <span className="font-black text-sm">REWARD SENT</span>
                 <NeoBadge variant="green">active</NeoBadge>
               </div>
             </div>

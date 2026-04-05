@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCart } from '@/lib/cart-context';
 import { ShoppingCart, Search } from 'lucide-react';
+import { ConnectButton } from './connect-button';
 import { useState } from 'react';
 
 export function Header() {
@@ -38,18 +39,27 @@ export function Header() {
             </div>
           </div>
 
-          {/* Cart Icon */}
-          <Link
-            href="/cart"
-            className="relative p-2 text-foreground hover:text-accent transition-colors flex-shrink-0"
-          >
-            <ShoppingCart size={24} />
-            {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                {itemCount > 99 ? '99+' : itemCount}
-              </span>
-            )}
-          </Link>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 group">
+               <Link href="/referrals" className="hidden md:inline text-[10px] font-bold uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">
+                  Rewards
+               </Link>
+               <ConnectButton />
+            </div>
+
+            {/* Cart Icon */}
+            <Link
+              href="/cart"
+              className="relative p-2 text-foreground hover:text-accent transition-colors flex-shrink-0"
+            >
+              <ShoppingCart size={24} />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
+            </Link>
+          </div>
         </div>
       </div>
     </header>
