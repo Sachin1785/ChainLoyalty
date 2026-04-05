@@ -124,6 +124,58 @@
   }
 }
 
+/* LoyaltyKit docs theme tokens used by /docs layout and components */
+html[data-theme="dark"],
+html:not([data-theme]) {
+  --lk-bg:             #070b11;
+  --lk-surface:        rgba(255,255,255,0.05);
+  --lk-surface-hover:  rgba(255,255,255,0.09);
+  --lk-surface-active: rgba(6,182,212,0.15);
+  --lk-border:         rgba(255,255,255,0.11);
+  --lk-border-strong:  rgba(255,255,255,0.22);
+  --lk-text:           #f1f5f9;
+  --lk-text-muted:     rgba(241,245,249,0.56);
+  --lk-text-faint:     rgba(241,245,249,0.32);
+  --lk-text-link:      #22d3ee;
+  --lk-sidebar-bg:     #0a0f1a;
+  --lk-preview-bg:     #0d1117;
+  --lk-preview-dot:    rgba(255,255,255,0.07);
+  --lk-code-bg:        #0a0a0a;
+  --lk-tab-active-bg:  rgba(255,255,255,0.10);
+  --lk-tab-text:       rgba(241,245,249,0.48);
+  --lk-badge-bg:       rgba(6,182,212,0.13);
+  --lk-badge-border:   rgba(6,182,212,0.32);
+  --lk-badge-text:     #22d3ee;
+  --lk-divider:        rgba(255,255,255,0.06);
+  --lk-accent:         #06b6d4;
+  --lk-shadow:         0 24px 64px rgba(0,0,0,0.7);
+}
+
+html[data-theme="light"] {
+  --lk-bg:             #f0f4f8;
+  --lk-surface:        rgba(255,255,255,0.85);
+  --lk-surface-hover:  rgba(0,0,0,0.05);
+  --lk-surface-active: rgba(6,182,212,0.12);
+  --lk-border:         rgba(0,0,0,0.10);
+  --lk-border-strong:  rgba(0,0,0,0.18);
+  --lk-text:           #0f172a;
+  --lk-text-muted:     rgba(15,23,42,0.58);
+  --lk-text-faint:     rgba(15,23,42,0.36);
+  --lk-text-link:      #0284c7;
+  --lk-sidebar-bg:     rgba(255,255,255,0.92);
+  --lk-preview-bg:     #dde3ed;
+  --lk-preview-dot:    rgba(0,0,0,0.07);
+  --lk-code-bg:        #1e1e2e;
+  --lk-tab-active-bg:  rgba(0,0,0,0.08);
+  --lk-tab-text:       rgba(15,23,42,0.50);
+  --lk-badge-bg:       rgba(2,132,199,0.10);
+  --lk-badge-border:   rgba(2,132,199,0.30);
+  --lk-badge-text:     #0284c7;
+  --lk-divider:        rgba(0,0,0,0.07);
+  --lk-accent:         #0284c7;
+  --lk-shadow:         0 12px 40px rgba(0,0,0,0.12);
+}
+
 /* Animate pulse with custom timing */
 @keyframes pulse-slow {
   0%, 100% {

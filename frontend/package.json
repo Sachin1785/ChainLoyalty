@@ -47,7 +47,7 @@
     "embla-carousel-react": "8.6.0",
     "highlight.js": "^11.9.0",
     "input-otp": "1.4.2",
-    "loyaltychain-sdk": "file:../sdk",
+    "loyaltychain-sdk": "0.2.0",
     "lucide-react": "^0.564.0",
     "next": "16.2.0",
     "next-themes": "^0.4.6",

@@ -16,10 +16,10 @@ export default function DocsIndexPage() {
     <div className="space-y-12">
       {/* Header */}
       <div className="space-y-4">
-        <h1 className="text-4xl font-bold text-white text-balance">
+        <h1 className="text-4xl font-bold text-balance" style={{ color: 'var(--lk-text)' }}>
           Components Library
         </h1>
-        <p className="text-lg text-white/70 max-w-2xl">
+        <p className="text-lg max-w-2xl" style={{ color: 'var(--lk-text-muted)' }}>
           A collection of beautiful, accessible, and customizable React components 
           built with Tailwind CSS and Radix UI.
         </p>
@@ -34,7 +34,7 @@ export default function DocsIndexPage() {
         return (
           <div key={category} className="space-y-4">
             <div>
-              <h2 className="text-2xl font-semibold text-white mb-2">
+              <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--lk-text)' }}>
                 {category}
               </h2>
               <div className="w-12 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full" />
@@ -51,10 +51,10 @@ export default function DocsIndexPage() {
                     'hover:shadow-lg hover:shadow-cyan-500/10'
                   )}
                 >
-                  <h3 className="font-semibold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                  <h3 className="font-semibold mb-2 group-hover:text-cyan-400 transition-colors" style={{ color: 'var(--lk-text)' }}>
                     {component.title}
                   </h3>
-                  <p className="text-sm text-white/70 group-hover:text-white/80 transition-colors">
+                  <p className="text-sm group-hover:text-white/80 transition-colors" style={{ color: 'var(--lk-text-muted)' }}>
                     {component.description}
                   </p>
                   <div className="mt-4 flex items-center text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity">

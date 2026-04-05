@@ -19,7 +19,7 @@ export interface AchievementShowcaseTheme {
   accent?: string;
   fontFamily?: string;
 }
-
+  
 export interface AchievementShowcaseWidgetProps {
   client: ChainLoyaltyClient;
   walletAddress: string;
