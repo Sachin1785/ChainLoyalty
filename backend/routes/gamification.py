@@ -202,6 +202,29 @@ def reveal_spin(wallet_address: str, salt_hex: str, lootbox_id: int = 1, program
         elif selected_prize["type"] == "BADGE":
             reward_type = "badge" # Changing this enables on-chain NFT claims
             
+            import subprocess
+            import os
+            try:
+                print(f"==========================================")
+                print(f"🚀 APP: TRIGGERING MINT SCRIPT (selected prize type BADGE)")
+                blockchain_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "blockchain"))
+                print(f"🚀 APP: Target directory is {blockchain_dir}")
+                env = os.environ.copy()
+                env["MINT_TO_ADDRESS"] = wallet_address
+                
+                # Trigger mint-simple.js asynchronously
+                proc = subprocess.Popen(
+                    "npx hardhat run scripts/mint-simple.js --network monad-testnet",
+                    cwd=blockchain_dir,
+                    env=env,
+                    shell=True
+                )
+                print(f"🚀 APP: MINT SUBPROCESS SPUN UP! (PID: {proc.pid})")
+                print(f"==========================================")
+            except Exception as e:
+                print(f"Failed to trigger mint script: {e}")
+
+            
         voucher_code = f"BREW-{secrets.token_hex(3).upper()}" if (reward_type == "voucher" or "Espresso" in selected_prize["label"] or "Cookie" in selected_prize["label"] or "Discount" in selected_prize["label"]) else None
         reason = f"Spin Result: {selected_prize['label']}"
         if voucher_code:

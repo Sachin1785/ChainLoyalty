@@ -90,7 +90,7 @@ export default function BadgesPage() {
     } catch (err) {
       console.error("Claim error:", err);
       setClaimingId(null);
-    } 
+    }
     // We don't nullify claimingId here to let the success effect use it
   };
 
@@ -107,7 +107,7 @@ export default function BadgesPage() {
     return { ...eb, standard: std };
   });
 
-  const locked = allStandards.filter(std => 
+  const locked = allStandards.filter(std =>
     !earnedBadges.some(eb => Number(eb.amount) === Number(std.id))
   );
 
@@ -146,16 +146,16 @@ export default function BadgesPage() {
                 </div>
                 <h3 className="font-black text-lg leading-tight">{badge.standard?.name || badge.reason}</h3>
                 <div className="flex items-center gap-2">
-                   <NeoBadge variant="black" className="text-[10px] py-0 px-2 h-5">
-                      {badge.standard?.point_value || 0} Points
-                   </NeoBadge>
+                  <NeoBadge variant="black" className="text-[10px] py-0 px-2 h-5">
+                    {badge.standard?.point_value || 0} Points
+                  </NeoBadge>
                 </div>
                 <p className="text-xs font-bold opacity-70 leading-tight">
                   {badge.standard?.description || "Badge earned on " + new Date(badge.created_at).toLocaleDateString()}
                 </p>
                 <div className="mt-4">
                   {badge.tx_hash ? (
-                    <a 
+                    <a
                       href={`https://monad-testnet.socialscan.io/tx/${badge.tx_hash}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -171,10 +171,9 @@ export default function BadgesPage() {
                       variant="primary"
                       size="sm"
                       className="w-full"
-                      onClick={() => handleClaim(badge)}
-                      disabled={claimingId === badge.id || isSigning || isWaiting}
+                      onClick={() => window.open("https://monad-testnet.socialscan.io/address/0xe9356db88fae28a221d4476239e65f0610bef8d7#tokentxnsNFT", "_blank")}
                     >
-                      {claimingId === badge.id || isSigning ? "Signing..." : isWaiting ? "Minting..." : "Claim NFT"}
+                      View NFT
                     </NeoButton>
                   )}
                 </div>
@@ -190,27 +189,27 @@ export default function BadgesPage() {
 
       {/* Locked / Discoverable Badges */}
       {locked.length > 0 && (
-         <section>
-            <h2 className="text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2">
-               <Lock size={20} className="opacity-40" /> Possible Achievements
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-               {locked.map((badge) => (
-               <NeoCard key={badge.id} className="p-6 bg-neo-white opacity-60 flex flex-col gap-3 grayscale" hover={false}>
-                  <div className="w-16 h-16 bg-black/10 border-4 border-black/20 rounded-2xl flex items-center justify-center shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] overflow-hidden">
-                     {badge.metadataUri ? (
-                        <img src={badge.metadataUri} alt={badge.name} className="w-full h-full object-cover opacity-30" />
-                     ) : (
-                        "🔒"
-                     )}
-                  </div>
-                  <h3 className="font-black text-lg leading-tight text-black/50">{badge.name}</h3>
-                  <p className="text-sm font-bold opacity-40">{badge.description}</p>
-                  <NeoBadge variant="black" className="self-start mt-auto opacity-30">Locked</NeoBadge>
-               </NeoCard>
-               ))}
-            </div>
-         </section>
+        <section>
+          <h2 className="text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2">
+            <Lock size={20} className="opacity-40" /> Possible Achievements
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {locked.map((badge) => (
+              <NeoCard key={badge.id} className="p-6 bg-neo-white opacity-60 flex flex-col gap-3 grayscale" hover={false}>
+                <div className="w-16 h-16 bg-black/10 border-4 border-black/20 rounded-2xl flex items-center justify-center shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] overflow-hidden">
+                  {badge.metadataUri ? (
+                    <img src={badge.metadataUri} alt={badge.name} className="w-full h-full object-cover opacity-30" />
+                  ) : (
+                    "🔒"
+                  )}
+                </div>
+                <h3 className="font-black text-lg leading-tight text-black/50">{badge.name}</h3>
+                <p className="text-sm font-bold opacity-40">{badge.description}</p>
+                <NeoBadge variant="black" className="self-start mt-auto opacity-30">Locked</NeoBadge>
+              </NeoCard>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
