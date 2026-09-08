@@ -28,7 +28,8 @@ export function App() {
 | Prop | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `client` | `ChainLoyaltyClient` | Required | Instance of the ChainLoyalty client. |
-| `walletAddress` | `string` | Required | Target user wallet address. |
+| `walletAddress` | `string` | Required | Target user wallet address. Falls back to "Connect Wallet" button if empty. |
+| `onConnect` | `(address: string) => void` | `undefined` | Callback function when the "Connect Wallet" button is clicked. |
 | `historyPageSize` | `number` | `5` | Number of recent activity items to list. |
 | `title` | `string` | `"My Rewards"` | Dashboard header. |
 | `theme` | `RewardsDashboardTheme` | See below | Visual style overrides. |

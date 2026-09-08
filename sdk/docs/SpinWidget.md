@@ -30,7 +30,8 @@ export function App() {
 | Prop | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `client` | `ChainLoyaltyClient` | Required | Instance of the ChainLoyalty client. |
-| `walletAddress` | `string` | Required* | User's wallet address. If set to `null` or `""`, the widget displays a **Connect Wallet** CTA. |
+| `walletAddress` | `string` | Required* | User's wallet address. If missing, the widget displays a **Connect Wallet** CTA. |
+| `onConnect` | `(address: string) => void` | `undefined` | Callback fired when the "Connect Wallet" button is clicked. |
 | `lootboxId` | `number \| string` | `1` | ID of the prize pool configuration. |
 | `title` | `string` | `"Spin & Win"` | Header text. |
 | `theme` | `SpinWidgetTheme` | See below | Custom style configuration. |
